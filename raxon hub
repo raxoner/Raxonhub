@@ -3,15 +3,14 @@ local Player = game.Players.LocalPlayer
 local Window = OrionLib:MakeWindow({Name = "Raxoner Hub", HidePremium = false, SaveConfig = true, ConfigFolder = "Raxoner"})
 
 OrionLib:MakeNotification({
-	Name = "Raxoner Hub Is Start!",
-	Content = "Khusus warga raxon,You logged in as "..Player.Name.."",
+	Name = "Raxoner Hub Is Loading!",
+	Content = "Khusus warga raxon,You logged in as "..Player.Name..""",
 	Image = "rbxassetid://4483345998",
 	Time = 5
-end
 })
 
 local Tab = Window:MakeTab({
-	Name = "Main Hub",
+	Name = "Raxoner Hub",
 	Icon = "rbxassetid://4483345998",
 	PremiumOnly = false
 })
