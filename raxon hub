@@ -42,9 +42,19 @@ local Button = PlayerTab:CreateButton({
 loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/refs/heads/main/Source.lua"))()()
    end,
 })
+
 local Button = PlayerTab:CreateButton({
  Name = "Script Omg Hub",
  Callback = function()
        loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))()()
-   end    
+   end,   
 })
+
+local Button = PlayerTab:CreateButton({
+ Name = "Script Speed X Hub",
+ Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))()()
+   end,   
+})
+
+
