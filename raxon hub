@@ -1,10 +1,12 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
 local Player = game.Players.LocalPlayer
+
 local Window = OrionLib:MakeWindow({Name = "Raxoner Hub", HidePremium = false, SaveConfig = true, ConfigFolder = "Raxoner"})
 
 OrionLib:MakeNotification({
 	Name = "Raxoner Hub Is Starting!",
-	Content = "Khusus warga raxon,You logged in as "..Player.Name.."",
+	Content = "Khusus warga raxon,You logged in as "..Player.Name..""",
 	Image = "rbxassetid://4483345998",
 	Time = 5
 })
