@@ -34,27 +34,32 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-local PlayerTab = Window:CreateTab("Raxoner", 4483362458) -- Title, Image
+local ScriptRTab = Window:CreateTab("Raxoner", 4483362458) -- Title, Image
 
-local Button = PlayerTab:CreateButton({
+local Button = ScriptRTab:CreateButton({
    Name = "Redz",
    Callback = function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/refs/heads/main/Source.lua"))()()
    end,
 })
 
-local Button = PlayerTab:CreateButton({
+local Button = ScriptRTab:CreateButton({
  Name = "Script Omg Hub",
  Callback = function()
        loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))()()
    end,   
 })
 
-local Button = PlayerTab:CreateButton({
+local Button = ScriptRTab:CreateButton({
  Name = "Script Speed X Hub",
  Callback = function()
        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))()()
    end,   
 })
 
-
+local Button = ScriptRTab:CreateButton({
+Name = "Script W Azure",
+ Callback = function()
+       loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3b2169cf53bc6104dabe8e19562e5cc2.lua"))()()
+   end,   
+})
