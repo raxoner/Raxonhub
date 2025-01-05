@@ -34,6 +34,13 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
+Rayfield:Notify({
+   Title = "SuperCapy Guard",
+   Content = "Hello "..Player.Name.."",
+   Duration = 5.5,
+   Image = 4483362458,
+})
+
 local ScriptXTab = Window:CreateTab("Main", 4483362458) -- Title, Image
 local Button = ScriptXTab:CreateButton({
    Name = "Own Script Raxoner",
