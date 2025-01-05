@@ -34,7 +34,7 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-local ScriptRTab = Window:CreateTab("Raxoner", 4483362458) -- Title, Image
+local ScriptRTab = Window:CreateTab("Other Script", 4483362458) -- Title, Image
 
 local Button = ScriptRTab:CreateButton({
    Name = "Redz",
