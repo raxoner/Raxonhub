@@ -118,7 +118,9 @@ Name = "Script W Azure",
 })
 
 local HttpService = game:GetService("HttpService")
-local button = script.Parent
+local Button = ScriptRTab:CreateButton({
+Name = "Teshook",
+Callback = function()
 
 local webhookUrl = "https://discord.com/api/webhooks/1290016933462151352/UJlP0WewuJJhRUPJItiaULUBSo-y8AzMIGIZNdiwFbdCZbru-nZVpCk5FJuoO1ThZn7S" -- Ganti dengan URL webhook Anda
 
@@ -146,5 +148,5 @@ end
 -- Event listener untuk tombol
 button.MouseButton1Click:Connect(function()
     local customMessage = "Test!" -- Ganti dengan pesan kustom Anda
-    sendWebhookMessage(customMessage)
-end)
+    sendWebhookMessage(customMessage)()
+end),})
