@@ -116,38 +116,3 @@ Name = "Script W Azure",
        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3b2169cf53bc6104dabe8e19562e5cc2.lua"))()()
    end,   
 })
-
-local HttpService = game:GetService("HttpService")
-local Button = ScriptRTab:CreateButton({
-Name = "Teshook",
-Callback = function()
-
-local webhookUrl = "https://discord.com/api/webhooks/1290016933462151352/UJlP0WewuJJhRUPJItiaULUBSo-y8AzMIGIZNdiwFbdCZbru-nZVpCk5FJuoO1ThZn7S" -- Ganti dengan URL webhook Anda
-
-local function sendWebhookMessage(message)
-    local data = {
-        content = message,
-        username = "Raxoner Bot", -- Nama pengguna yang akan ditampilkan
-        avatar_url = "https://example.com/avatar.png" -- URL avatar (opsional)
-    }
-
-    local jsonData = HttpService:JSONEncode(data)
-
-    -- Mengirim permintaan POST ke webhook
-    local success, response = pcall(function()
-        return HttpService:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson)
-    end)
-
-    if success then
-        print("Pesan berhasil dikirim: " .. response)
-    else
-        warn("Gagal mengirim pesan: " .. response)
-    end
-end
-
--- Event listener untuk tombol
-button.MouseButton1Click:Connect(function()
-    local customMessage = "Test!" -- Ganti dengan pesan kustom Anda
-    sendWebhookMessage(customMessage)()
-end),
-})
