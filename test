@@ -160,4 +160,14 @@ function loadSuperCapyUI()
             print("Masukkan Job ID yang valid!")
         end
     end)
+
+-- Fungsi Load Script
+    LoadScriptButton.MouseButton1Click:Connect(function()
+        local scriptURL = ScriptInput.Text
+        if scriptURL and scriptURL ~= "" then
+            loadstring(game:HttpGet(scriptURL))()
+        else
+            print("Masukkan URL/File script yang valid!")
+        end
+    end)
 end
