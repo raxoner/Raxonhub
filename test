@@ -1,108 +1,163 @@
--- CapybaraHub.lua (LocalScript)
-local TeleportService = game:GetService("TeleportService")
-local Players = game:GetService("Players")
+-- Pastikan script dijalankan di LocalScript
+local player = game.Players.LocalPlayer
+local playerGui = player:FindFirstChild("PlayerGui")
 
--- Mengambil ScreenGui
-local screenGui = script.Parent
+if not playerGui then
+    warn("Tidak ditemukan PlayerGui!")
+    return
+end
 
--- Membuat background frame dengan gambar laut
-local oceanBackground = Instance.new("Frame")
-oceanBackground.Size = UDim2.new(0, 500, 0, 400)
-oceanBackground.Position = UDim2.new(0.5, -250, 0.5, -200)
-oceanBackground.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-oceanBackground.BackgroundTransparency = 0.5
-oceanBackground.Image = "rbxassetid://123456789"  -- Ganti dengan ID gambar laut Anda
-oceanBackground.Parent = screenGui
+-- Nama file untuk menyimpan password
+local passwordFile = "SuperCapy/password.txt"
+makefolder("SuperCapy") -- Membuat folder jika belum ada
+local defaultPassword = "WargaCapy456"
 
--- Menambahkan judul Capybara Hub
-local title = Instance.new("TextLabel")
-title.Text = "Capybara Hub"
-title.Size = UDim2.new(1, 0, 0, 50)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.TextSize = 36
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.BackgroundTransparency = 1
-title.Parent = oceanBackground
+-- Cek apakah password sudah tersimpan
+local savedPassword
+if isfile(passwordFile) then
+    savedPassword = readfile(passwordFile)
+else
+    writefile(passwordFile, defaultPassword)
+    savedPassword = defaultPassword
+end
 
--- Menambahkan tombol untuk petualangan
-local adventureButton = Instance.new("TextButton")
-adventureButton.Text = "Start Adventure"
-adventureButton.Size = UDim2.new(0, 200, 0, 50)
-adventureButton.Position = UDim2.new(0.5, -100, 0.5, 50)
-adventureButton.TextSize = 18
-adventureButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
-adventureButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-adventureButton.Parent = oceanBackground
-adventureButton.MouseButton1Click:Connect(function()
-    print("Adventure Started!")
-end)
+-- UI Login
+local LoginGUI = Instance.new("ScreenGui")
+LoginGUI.Name = "SuperCapyLogin"
+LoginGUI.Parent = playerGui
 
--- Menambahkan tombol untuk info capybara
-local infoButton = Instance.new("TextButton")
-infoButton.Text = "Capybara Info"
-infoButton.Size = UDim2.new(0, 200, 0, 50)
-infoButton.Position = UDim2.new(0.5, -100, 0.5, 120)
-infoButton.TextSize = 18
-infoButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
-infoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-infoButton.Parent = oceanBackground
-infoButton.MouseButton1Click:Connect(function()
-    print("Displaying Capybara Info!")
-end)
+local LoginFrame = Instance.new("Frame")
+LoginFrame.Size = UDim2.new(0, 300, 0, 150)
+LoginFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
+LoginFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+LoginFrame.Parent = LoginGUI
 
--- Menambahkan tombol keluar
-local exitButton = Instance.new("TextButton")
-exitButton.Text = "Exit"
-exitButton.Size = UDim2.new(0, 200, 0, 50)
-exitButton.Position = UDim2.new(0.5, -100, 0.5, 190)
-exitButton.TextSize = 18
-exitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-exitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-exitButton.Parent = oceanBackground
-exitButton.MouseButton1Click:Connect(function()
-    game:Shutdown()  -- Menutup game saat tombol Exit diklik
-end)
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "SuperCapy Login"
+Title.TextSize = 18
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.Parent = LoginFrame
 
--- Menambahkan tombol untuk menyalin Job ID
-local copyJobIDButton = Instance.new("TextButton")
-copyJobIDButton.Text = "Copy Job ID"
-copyJobIDButton.Size = UDim2.new(0, 200, 0, 50)
-copyJobIDButton.Position = UDim2.new(0.5, -100, 0.5, 260)
-copyJobIDButton.TextSize = 18
-copyJobIDButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
-copyJobIDButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-copyJobIDButton.Parent = oceanBackground
-copyJobIDButton.MouseButton1Click:Connect(function()
-    local jobID = game.JobId
-    setclipboard(jobID)
-    print("Job ID copied: " .. jobID)
-end)
+local PasswordBox = Instance.new("TextBox")
+PasswordBox.Size = UDim2.new(0.8, 0, 0, 30)
+PasswordBox.Position = UDim2.new(0.1, 0, 0.4, 0)
+PasswordBox.PlaceholderText = "Masukkan Password"
+PasswordBox.Text = ""
+PasswordBox.Parent = LoginFrame
 
--- Menambahkan input box untuk memasukkan Job ID
-local jobIDInputBox = Instance.new("TextBox")
-jobIDInputBox.Size = UDim2.new(0, 200, 0, 50)
-jobIDInputBox.Position = UDim2.new(0.5, -100, 0.5, 330)
-jobIDInputBox.PlaceholderText = "Enter Job ID"
-jobIDInputBox.TextSize = 18
-jobIDInputBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-jobIDInputBox.Parent = oceanBackground
+local LoginButton = Instance.new("TextButton")
+LoginButton.Size = UDim2.new(0.8, 0, 0, 30)
+LoginButton.Position = UDim2.new(0.1, 0, 0.7, 0)
+LoginButton.Text = "Login"
+LoginButton.BackgroundColor3 = Color3.fromRGB(100, 250, 100)
+LoginButton.Parent = LoginFrame
 
--- Menambahkan tombol untuk bergabung ke server dengan Job ID yang dimasukkan
-local joinServerButton = Instance.new("TextButton")
-joinServerButton.Text = "Join Server"
-joinServerButton.Size = UDim2.new(0, 200, 0, 50)
-joinServerButton.Position = UDim2.new(0.5, -100, 0.5, 400)
-joinServerButton.TextSize = 18
-joinServerButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
-joinServerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-joinServerButton.Parent = oceanBackground
-joinServerButton.MouseButton1Click:Connect(function()
-    local jobID = jobIDInputBox.Text
-    if jobID ~= "" then
-        -- Teleport ke server dengan Job ID yang dimasukkan
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobID, Players.LocalPlayer)
-        print("Attempting to join server with Job ID: " .. jobID)
+-- Fungsi Verifikasi Password
+local function verifyPassword()
+    if PasswordBox.Text == savedPassword then
+        print("Login Berhasil!")
+        LoginGUI:Destroy()
+        loadSuperCapyUI()
     else
-        print("Please enter a valid Job ID.")
+        print("Password Salah!")
     end
-end)
+end
+
+LoginButton.MouseButton1Click:Connect(verifyPassword)
+
+-- Fungsi Memuat UI SuperCapy
+function loadSuperCapyUI()
+    local SuperCapyUI = Instance.new("ScreenGui")
+    SuperCapyUI.Name = "SuperCapyUI"
+    SuperCapyUI.Parent = playerGui
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 300, 0, 350)
+    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -175)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    MainFrame.Parent = SuperCapyUI
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.Text = "SuperCapy Hub"
+    Title.TextSize = 20
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.BackgroundTransparency = 1
+    Title.Parent = MainFrame
+
+    -- Tombol Hop Server
+    local HopServerButton = Instance.new("TextButton")
+    HopServerButton.Size = UDim2.new(0.8, 0, 0, 40)
+    HopServerButton.Position = UDim2.new(0.1, 0, 0.2, 0)
+    HopServerButton.BackgroundColor3 = Color3.fromRGB(150, 100, 250)
+    HopServerButton.Text = "Hop Server"
+    HopServerButton.Parent = MainFrame
+
+    -- Tombol Salin Job ID
+    local CopyJobIDButton = Instance.new("TextButton")
+    CopyJobIDButton.Size = UDim2.new(0.8, 0, 0, 40)
+    CopyJobIDButton.Position = UDim2.new(0.1, 0, 0.3, 0)
+    CopyJobIDButton.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+    CopyJobIDButton.Text = "Salin Job ID"
+    CopyJobIDButton.Parent = MainFrame
+
+    -- Tombol Join Server dengan Job ID
+    local JoinJobIDButton = Instance.new("TextButton")
+    JoinJobIDButton.Size = UDim2.new(0.8, 0, 0, 40)
+    JoinJobIDButton.Position = UDim2.new(0.1, 0, 0.4, 0)
+    JoinJobIDButton.BackgroundColor3 = Color3.fromRGB(200, 100, 100)
+    JoinJobIDButton.Text = "Join via Job ID"
+    JoinJobIDButton.Parent = MainFrame
+
+    local JobIDInput = Instance.new("TextBox")
+    JobIDInput.Size = UDim2.new(0.8, 0, 0, 30)
+    JobIDInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+    JobIDInput.PlaceholderText = "Masukkan Job ID"
+    JobIDInput.Text = ""
+    JobIDInput.Parent = MainFrame
+
+    -- Tombol Load Script
+    local LoadScriptButton = Instance.new("TextButton")
+    LoadScriptButton.Size = UDim2.new(0.8, 0, 0, 40)
+    LoadScriptButton.Position = UDim2.new(0.1, 0, 0.6, 0)
+    LoadScriptButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+    LoadScriptButton.Text = "Load Script"
+    LoadScriptButton.Parent = MainFrame
+
+    local ScriptInput = Instance.new("TextBox")
+    ScriptInput.Size = UDim2.new(0.8, 0, 0, 30)
+    ScriptInput.Position = UDim2.new(0.1, 0, 0.55, 0)
+    ScriptInput.PlaceholderText = "Masukkan URL/File Script"
+    ScriptInput.Text = ""
+    ScriptInput.Parent = MainFrame
+
+    -- Fungsi Hop Server
+    HopServerButton.MouseButton1Click:Connect(function()
+        local HttpService = game:GetService("HttpService")
+        local Servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+        for _, server in pairs(Servers.data) do
+            if server.id ~= game.JobId and server.playing < server.maxPlayers then
+                game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, server.id, player)
+                break
+            end
+        end
+    end)
+
+    -- Fungsi Salin Job ID
+    CopyJobIDButton.MouseButton1Click:Connect(function()
+        setclipboard(game.JobId)
+        print("Job ID telah disalin: " .. game.JobId)
+    end)
+
+    -- Fungsi Join Server via Job ID
+    JoinJobIDButton.MouseButton1Click:Connect(function()
+        local jobID = JobIDInput.Text
+        if jobID and jobID ~= "" then
+            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, jobID, player)
+        else
+            print("Masukkan Job ID yang valid!")
+        end
+    end)
+end
