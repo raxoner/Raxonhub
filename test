@@ -1,184 +1,121 @@
--- Pastikan script dijalankan di LocalScript
-local player = game.Players.LocalPlayer
-local playerGui = player:FindFirstChild("PlayerGui")
+-- Creating UI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-if not playerGui then
-    warn("Tidak ditemukan PlayerGui!")
-    return
-end
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 300, 0, 350)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -175)
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.Parent = ScreenGui
 
--- Nama file untuk menyimpan password
-local passwordFile = "SuperCapy/password.txt"
-makefolder("SuperCapy") -- Membuat folder jika belum ada
-local defaultPassword = "WargaCapy456"
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0, 100, 0, 50)
+MinimizeButton.Position = UDim2.new(0, 0, 0, -50)
+MinimizeButton.Text = "Minimize"
+MinimizeButton.Parent = Frame
 
--- Cek apakah password sudah tersimpan
-local savedPassword
-if isfile(passwordFile) then
-    savedPassword = readfile(passwordFile)
-else
-    writefile(passwordFile, defaultPassword)
-    savedPassword = defaultPassword
-end
+local RemoveButton = Instance.new("TextButton")
+RemoveButton.Size = UDim2.new(0, 100, 0, 50)
+RemoveButton.Position = UDim2.new(0, 200, 0, -50)
+RemoveButton.Text = "Remove"
+RemoveButton.Parent = Frame
 
--- UI Login
-local LoginGUI = Instance.new("ScreenGui")
-LoginGUI.Name = "SuperCapyLogin"
-LoginGUI.Parent = playerGui
+local CopyJobButton = Instance.new("TextButton")
+CopyJobButton.Size = UDim2.new(0, 200, 0, 50)
+CopyJobButton.Position = UDim2.new(0, 50, 0, 50)
+CopyJobButton.Text = "Copy Job ID"
+CopyJobButton.Parent = Frame
 
-local LoginFrame = Instance.new("Frame")
-LoginFrame.Size = UDim2.new(0, 400, 0, 200)
-LoginFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
-LoginFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-LoginFrame.BorderSizePixel = 5
-LoginFrame.BorderColor3 = Color3.fromRGB(255, 165, 0)
-LoginFrame.Parent = LoginGUI
+local JoinJobButton = Instance.new("TextButton")
+JoinJobButton.Size = UDim2.new(0, 200, 0, 50)
+JoinJobButton.Position = UDim2.new(0, 50, 0, 110)
+JoinJobButton.Text = "Join Job ID"
+JoinJobButton.Parent = Frame
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Text = "SuperCapy Login"
-Title.TextSize = 24
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundTransparency = 1
-Title.Parent = LoginFrame
+local WalkSpeedSlider = Instance.new("Slider")
+WalkSpeedSlider.Size = UDim2.new(0, 200, 0, 50)
+WalkSpeedSlider.Position = UDim2.new(0, 50, 0, 170)
+WalkSpeedSlider.MinValue = 10
+WalkSpeedSlider.MaxValue = 300
+WalkSpeedSlider.Text = "Walk Speed"
+WalkSpeedSlider.Parent = Frame
 
-local PasswordBox = Instance.new("TextBox")
-PasswordBox.Size = UDim2.new(0.8, 0, 0, 40)
-PasswordBox.Position = UDim2.new(0.1, 0, 0.4, 0)
-PasswordBox.PlaceholderText = "Masukkan Password"
-PasswordBox.Text = ""
-PasswordBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-PasswordBox.BorderSizePixel = 2
-PasswordBox.BorderColor3 = Color3.fromRGB(255, 165, 0)
-PasswordBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-PasswordBox.Parent = LoginFrame
+local FlyHeightSlider = Instance.new("Slider")
+FlyHeightSlider.Size = UDim2.new(0, 200, 0, 50)
+FlyHeightSlider.Position = UDim2.new(0, 50, 0, 230)
+FlyHeightSlider.MinValue = 5
+FlyHeightSlider.MaxValue = 600
+FlyHeightSlider.Text = "Fly Height"
+FlyHeightSlider.Parent = Frame
 
-local LoginButton = Instance.new("TextButton")
-LoginButton.Size = UDim2.new(0.8, 0, 0, 40)
-LoginButton.Position = UDim2.new(0.1, 0, 0.7, 0)
-LoginButton.Text = "Login"
-LoginButton.TextSize = 18
-LoginButton.BackgroundColor3 = Color3.fromRGB(100, 250, 100)
-LoginButton.BorderSizePixel = 2
-LoginButton.BorderColor3 = Color3.fromRGB(0, 255, 0)
-LoginButton.Parent = LoginFrame
+local OnOffButton = Instance.new("TextButton")
+OnOffButton.Size = UDim2.new(0, 200, 0, 50)
+OnOffButton.Position = UDim2.new(0, 50, 0, 290)
+OnOffButton.Text = "On/Off"
+OnOffButton.Parent = Frame
 
--- Tombol X untuk Menutup UI Login
-local CloseButton = Instance.new("TextButton")
-CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
-CloseButton.Text = "X"
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-CloseButton.TextSize = 18
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.Parent = LoginFrame
+local InfiniteJumpToggle = Instance.new("TextButton")
+InfiniteJumpToggle.Size = UDim2.new(0, 200, 0, 50)
+InfiniteJumpToggle.Position = UDim2.new(0, 50, 0, 350)
+InfiniteJumpToggle.Text = "Infinite Jump"
+InfiniteJumpToggle.Parent = Frame
 
--- Fungsi untuk Menutup UI Login
-CloseButton.MouseButton1Click:Connect(function()
-    LoginGUI:Destroy()
+local minimized = false
+local jobID = "123456789"  -- Example Job ID
+local flying = false
+local infiniteJump = false
+
+-- Minimize functionality
+MinimizeButton.MouseButton1Click:Connect(function()
+    if minimized then
+        Frame.Size = UDim2.new(0, 300, 0, 350)
+        MinimizeButton.Text = "Minimize"
+    else
+        Frame.Size = UDim2.new(0, 300, 0, 50)
+        MinimizeButton.Text = "Restore"
+    end
+    minimized = not minimized
 end)
 
--- Fungsi Verifikasi Password
-local function verifyPassword()
-    if PasswordBox.Text == savedPassword then
-        print("Login Berhasil!")
-        LoginGUI:Destroy()
-        loadSuperCapyUI()
-    else
-        print("Password Salah!")
+-- Remove functionality
+RemoveButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Copy Job ID functionality
+CopyJobButton.MouseButton1Click:Connect(function()
+    setclipboard(jobID)
+    print("Job ID copied: " .. jobID)
+end)
+
+-- Join Job ID functionality
+JoinJobButton.MouseButton1Click:Connect(function()
+    game:GetService("TeleportService"):Teleport(jobID)
+    print("Joining job with ID: " .. jobID)
+end)
+
+-- Walk Speed Slider
+WalkSpeedSlider.Changed:Connect(function()
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = WalkSpeedSlider.Value
+end)
+
+-- Fly Height Slider
+FlyHeightSlider.Changed:Connect(function()
+    if flying then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, FlyHeightSlider.Value, 0))
     end
-end
+end)
 
-LoginButton.MouseButton1Click:Connect(verifyPassword)
+-- On/Off Toggle
+OnOffButton.MouseButton1Click:Connect(function()
+    flying = not flying
+    OnOffButton.Text = flying and "Flying On" or "Flying Off"
+end)
 
--- Fungsi Memuat UI SuperCapy
-function loadSuperCapyUI()
-    local SuperCapyUI = Instance.new("ScreenGui")
-    SuperCapyUI.Name = "SuperCapyUI"
-    SuperCapyUI.Parent = playerGui
-
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 400, 0, 450)
-    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -225)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    MainFrame.BorderSizePixel = 5
-    MainFrame.BorderColor3 = Color3.fromRGB(255, 165, 0)
-    MainFrame.Parent = SuperCapyUI
-
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 40)
-    Title.Text = "SuperCapy Hub"
-    Title.TextSize = 24
-    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Title.BackgroundTransparency = 1
-    Title.Parent = MainFrame
-
-    -- Tombol Auto Farm
-    local AutoFarmButton = Instance.new("TextButton")
-    AutoFarmButton.Size = UDim2.new(0.8, 0, 0, 50)
-    AutoFarmButton.Position = UDim2.new(0.1, 0, 0.2, 0)
-    AutoFarmButton.BackgroundColor3 = Color3.fromRGB(50, 150, 250)
-    AutoFarmButton.Text = "Auto Farm: OFF"
-    AutoFarmButton.TextSize = 20
-    AutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    AutoFarmButton.Parent = MainFrame
-
-    -- Tombol Minimize UI
-    local MinimizeButton = Instance.new("TextButton")
-    MinimizeButton.Size = UDim2.new(0.2, 0, 0, 40)
-    MinimizeButton.Position = UDim2.new(0.8, 0, 0, 0)
-    MinimizeButton.Text = "_"
-    MinimizeButton.TextSize = 20
-    MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
-    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MinimizeButton.Parent = MainFrame
-
-    local minimized = false
-
-    -- Fungsi untuk Minimize UI
-    MinimizeButton.MouseButton1Click:Connect(function()
-        if minimized then
-            MainFrame.Size = UDim2.new(0, 400, 0, 450)
-            MinimizeButton.Text = "_"
-        else
-            MainFrame.Size = UDim2.new(0, 400, 0, 40)
-            MinimizeButton.Text = "+"
-        end
-        minimized = not minimized
-    end)
-
-    -- Fungsi Auto Farm
-    local autoFarming = false
-    AutoFarmButton.MouseButton1Click:Connect(function()
-        autoFarming = not autoFarming
-        if autoFarming then
-            AutoFarmButton.Text = "Auto Farm: ON"
-            startAutoFarm()
-        else
-            AutoFarmButton.Text = "Auto Farm: OFF"
-            stopAutoFarm()
-        end
-    end)
-
-    -- Fungsi untuk menjalankan Auto Farm
-    function startAutoFarm()
-        -- Ganti dengan logika Auto Farm yang sesuai di sini
-        -- Misalnya, menggunakan karakter untuk memukul musuh secara otomatis
-        local enemy = game.Workspace:WaitForChild("Enemy") -- Ganti dengan objek musuh
-        while autoFarming do
-            -- Contoh tindakan otomatis
-            if enemy and enemy:FindFirstChild("Humanoid") then
-                player.Character:MoveTo(enemy.HumanoidRootPart.Position)
-                wait(0.5) -- Tunggu setengah detik sebelum menyerang lagi
-                fireclickdetector(enemy:FindFirstChildOfClass("ClickDetector"))
-            end
-            wait(1) -- Jeda antar aksi
-        end
-    end
-
-    -- Fungsi untuk menghentikan Auto Farm
-    function stopAutoFarm()
-        -- Berhenti melakukan auto farm jika diperlukan
-        -- Kamu bisa menambahkan logika tambahan di sini
-    end
-end
+-- Infinite Jump Toggle
+InfiniteJumpToggle.MouseButton1Click:Connect(function()
+    infiniteJump = not infiniteJump
+    InfiniteJumpToggle.Text = infiniteJump and "Infinite Jump On" or "Infinite Jump Off"
+    local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+    humanoid.JumpPower = infiniteJump and 100 or 50
+end)
