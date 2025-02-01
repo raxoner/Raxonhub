@@ -1,89 +1,50 @@
-local player = game.Players.LocalPlayer
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player:WaitForChild("PlayerGui")
+-- CapybaraHub.lua (LocalScript)
+local UIUtils = require(game.ReplicatedStorage.UIUtils)
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
 
--- Main Frame for UI
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 400, 0, 250)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.BorderSizePixel = 2
-mainFrame.BorderColor3 = Color3.fromRGB(100, 100, 100)
-mainFrame.Parent = screenGui
+-- Mengambil ScreenGui
+local screenGui = script.Parent
 
--- Title Label
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(0, 400, 0, 50)
-titleLabel.Position = UDim2.new(0, 0, 0, 0)
-titleLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-titleLabel.Text = "Job ID Server Tools"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextSize = 24
-titleLabel.TextAlign = Enum.TextXAlignment.Center
-titleLabel.Parent = mainFrame
+-- Membuat background frame dengan gambar laut
+local oceanBackground = UIUtils.createFrame(screenGui, UDim2.new(0, 500, 0, 400), UDim2.new(0.5, -250, 0.5, -200), Color3.fromRGB(255, 255, 255), "rbxassetid://123456789")  -- Ganti dengan ID gambar laut Anda
 
--- Job ID Display (for current job)
-local jobIdDisplayLabel = Instance.new("TextLabel")
-jobIdDisplayLabel.Size = UDim2.new(0, 300, 0, 40)
-jobIdDisplayLabel.Position = UDim2.new(0, 50, 0, 60)
-jobIdDisplayLabel.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-jobIdDisplayLabel.Text = "Current Job ID: " .. game.JobId
-jobIdDisplayLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-jobIdDisplayLabel.TextSize = 18
-jobIdDisplayLabel.TextWrapped = true
-jobIdDisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
-jobIdDisplayLabel.Parent = mainFrame
+-- Menambahkan judul Capybara Hub
+local title = UIUtils.createLabel(oceanBackground, "Capybara Hub", UDim2.new(1, 0, 0, 50), UDim2.new(0, 0, 0, 0), 36, Color3.fromRGB(255, 255, 255))
 
--- Copy Job ID Button
-local copyJobButton = Instance.new("TextButton")
-copyJobButton.Size = UDim2.new(0, 150, 0, 40)
-copyJobButton.Position = UDim2.new(0, 50, 0, 120)
-copyJobButton.BackgroundColor3 = Color3.fromRGB(40, 120, 255)
-copyJobButton.Text = "Copy Job ID"
-copyJobButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-copyJobButton.TextSize = 18
-copyJobButton.Parent = mainFrame
-
--- Job ID Input Field for joining
-local jobIdInput = Instance.new("TextBox")
-jobIdInput.Size = UDim2.new(0, 300, 0, 40)
-jobIdInput.Position = UDim2.new(0, 50, 0, 170)
-jobIdInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-jobIdInput.Text = ""
-jobIdInput.PlaceholderText = "Enter Job ID to Join"
-jobIdInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-jobIdInput.TextSize = 18
-jobIdInput.ClearTextOnFocus = true
-jobIdInput.Parent = mainFrame
-
--- Join Job Button
-local joinJobButton = Instance.new("TextButton")
-joinJobButton.Size = UDim2.new(0, 150, 0, 40)
-joinJobButton.Position = UDim2.new(0, 50, 0, 220)
-joinJobButton.BackgroundColor3 = Color3.fromRGB(40, 255, 120)
-joinJobButton.Text = "Join Job ID"
-joinJobButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-joinJobButton.TextSize = 18
-joinJobButton.Parent = mainFrame
-
--- Function to Copy Job ID to Clipboard
-copyJobButton.MouseButton1Click:Connect(function()
-    local jobId = game.JobId
-    setclipboard(jobId)  -- Copy current job ID to clipboard
+-- Menambahkan tombol untuk petualangan
+local adventureButton = UIUtils.createButton(oceanBackground, "Start Adventure", UDim2.new(0, 200, 0, 50), UDim2.new(0.5, -100, 0.5, 50), function()
+    print("Adventure Started!")
 end)
 
--- Function to Join Job ID
-joinJobButton.MouseButton1Click:Connect(function()
-    local enteredJobId = jobIdInput.Text
-    if enteredJobId ~= "" then
-        local success, message = pcall(function()
-            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, enteredJobId, player)
-        end)
-        
-        if not success then
-            warn("Failed to join Job ID: " .. message)
-        end
+-- Menambahkan tombol untuk info capybara
+local infoButton = UIUtils.createButton(oceanBackground, "Capybara Info", UDim2.new(0, 200, 0, 50), UDim2.new(0.5, -100, 0.5, 120), function()
+    print("Displaying Capybara Info!")
+end)
+
+-- Menambahkan tombol keluar
+local exitButton = UIUtils.createButton(oceanBackground, "Exit", UDim2.new(0, 200, 0, 50), UDim2.new(0.5, -100, 0.5, 190), function()
+    game:Shutdown()  -- Menutup game saat tombol Exit diklik
+end)
+
+-- Menambahkan tombol untuk menyalin Job ID
+local copyJobIDButton = UIUtils.createButton(oceanBackground, "Copy Job ID", UDim2.new(0, 200, 0, 50), UDim2.new(0.5, -100, 0.5, 260), function()
+    local jobID = game.JobId
+    setclipboard(jobID)
+    print("Job ID copied: " .. jobID)
+end)
+
+-- Menambahkan input box untuk memasukkan Job ID
+local jobIDInputBox = UIUtils.createTextBox(oceanBackground, UDim2.new(0, 200, 0, 50), UDim2.new(0.5, -100, 0.5, 330), "Enter Job ID")
+
+-- Menambahkan tombol untuk bergabung ke server dengan Job ID yang dimasukkan
+local joinServerButton = UIUtils.createButton(oceanBackground, "Join Server", UDim2.new(0, 200, 0, 50), UDim2.new(0.5, -100, 0.5, 400), function()
+    local jobID = jobIDInputBox.Text
+    if jobID ~= "" then
+        -- Teleport ke server dengan Job ID yang dimasukkan
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobID, Players.LocalPlayer)
+        print("Attempting to join server with Job ID: " .. jobID)
     else
-        warn("Please enter a valid Job ID.")
+        print("Please enter a valid Job ID.")
     end
 end)
