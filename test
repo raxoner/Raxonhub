@@ -27,31 +27,40 @@ LoginGUI.Name = "SuperCapyLogin"
 LoginGUI.Parent = playerGui
 
 local LoginFrame = Instance.new("Frame")
-LoginFrame.Size = UDim2.new(0, 300, 0, 150)
-LoginFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
-LoginFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+LoginFrame.Size = UDim2.new(0, 400, 0, 200)
+LoginFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
+LoginFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+LoginFrame.BorderSizePixel = 5
+LoginFrame.BorderColor3 = Color3.fromRGB(255, 165, 0)
 LoginFrame.Parent = LoginGUI
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Size = UDim2.new(1, 0, 0, 40)
 Title.Text = "SuperCapy Login"
-Title.TextSize = 18
+Title.TextSize = 24
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.BackgroundTransparency = 1
 Title.Parent = LoginFrame
 
 local PasswordBox = Instance.new("TextBox")
-PasswordBox.Size = UDim2.new(0.8, 0, 0, 30)
+PasswordBox.Size = UDim2.new(0.8, 0, 0, 40)
 PasswordBox.Position = UDim2.new(0.1, 0, 0.4, 0)
 PasswordBox.PlaceholderText = "Masukkan Password"
 PasswordBox.Text = ""
+PasswordBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+PasswordBox.BorderSizePixel = 2
+PasswordBox.BorderColor3 = Color3.fromRGB(255, 165, 0)
+PasswordBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 PasswordBox.Parent = LoginFrame
 
 local LoginButton = Instance.new("TextButton")
-LoginButton.Size = UDim2.new(0.8, 0, 0, 30)
+LoginButton.Size = UDim2.new(0.8, 0, 0, 40)
 LoginButton.Position = UDim2.new(0.1, 0, 0.7, 0)
 LoginButton.Text = "Login"
+LoginButton.TextSize = 18
 LoginButton.BackgroundColor3 = Color3.fromRGB(100, 250, 100)
+LoginButton.BorderSizePixel = 2
+LoginButton.BorderColor3 = Color3.fromRGB(0, 255, 0)
 LoginButton.Parent = LoginFrame
 
 -- Tombol X untuk Menutup UI Login
@@ -60,6 +69,8 @@ CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
 CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
 CloseButton.Text = "X"
 CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseButton.TextSize = 18
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.Parent = LoginFrame
 
 -- Fungsi untuk Menutup UI Login
@@ -87,34 +98,39 @@ function loadSuperCapyUI()
     SuperCapyUI.Parent = playerGui
 
     local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 300, 0, 350)
-    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -175)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    MainFrame.Size = UDim2.new(0, 400, 0, 450)
+    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -225)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    MainFrame.BorderSizePixel = 5
+    MainFrame.BorderColor3 = Color3.fromRGB(255, 165, 0)
     MainFrame.Parent = SuperCapyUI
 
     local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.Size = UDim2.new(1, 0, 0, 40)
     Title.Text = "SuperCapy Hub"
-    Title.TextSize = 20
+    Title.TextSize = 24
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.BackgroundTransparency = 1
     Title.Parent = MainFrame
 
     -- Tombol Auto Farm
     local AutoFarmButton = Instance.new("TextButton")
-    AutoFarmButton.Size = UDim2.new(0.8, 0, 0, 40)
+    AutoFarmButton.Size = UDim2.new(0.8, 0, 0, 50)
     AutoFarmButton.Position = UDim2.new(0.1, 0, 0.2, 0)
     AutoFarmButton.BackgroundColor3 = Color3.fromRGB(50, 150, 250)
     AutoFarmButton.Text = "Auto Farm: OFF"
-    AutoFarmButton.TextSize = 18
+    AutoFarmButton.TextSize = 20
+    AutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     AutoFarmButton.Parent = MainFrame
 
     -- Tombol Minimize UI
     local MinimizeButton = Instance.new("TextButton")
-    MinimizeButton.Size = UDim2.new(0.2, 0, 0, 30)
+    MinimizeButton.Size = UDim2.new(0.2, 0, 0, 40)
     MinimizeButton.Position = UDim2.new(0.8, 0, 0, 0)
     MinimizeButton.Text = "_"
+    MinimizeButton.TextSize = 20
     MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     MinimizeButton.Parent = MainFrame
 
     local minimized = false
@@ -122,10 +138,10 @@ function loadSuperCapyUI()
     -- Fungsi untuk Minimize UI
     MinimizeButton.MouseButton1Click:Connect(function()
         if minimized then
-            MainFrame.Size = UDim2.new(0, 300, 0, 350)
+            MainFrame.Size = UDim2.new(0, 400, 0, 450)
             MinimizeButton.Text = "_"
         else
-            MainFrame.Size = UDim2.new(0, 300, 0, 30)
+            MainFrame.Size = UDim2.new(0, 400, 0, 40)
             MinimizeButton.Text = "+"
         end
         minimized = not minimized
