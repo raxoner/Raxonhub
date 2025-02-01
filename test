@@ -74,8 +74,8 @@ function loadSuperCapyUI()
     SuperCapyUI.Parent = playerGui
 
     local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 300, 0, 250)
-    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+    MainFrame.Size = UDim2.new(0, 300, 0, 300)
+    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
     MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     MainFrame.Parent = SuperCapyUI
 
@@ -94,68 +94,38 @@ function loadSuperCapyUI()
     AutoFarmButton.BackgroundColor3 = Color3.fromRGB(50, 150, 250)
     AutoFarmButton.Text = "Auto Farm: OFF"
     AutoFarmButton.TextSize = 18
-    AutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     AutoFarmButton.Parent = MainFrame
-
-    -- Tombol Auto Attack
-    local AutoAttackButton = Instance.new("TextButton")
-    AutoAttackButton.Size = UDim2.new(0.8, 0, 0, 40)
-    AutoAttackButton.Position = UDim2.new(0.1, 0, 0.4, 0)
-    AutoAttackButton.BackgroundColor3 = Color3.fromRGB(250, 100, 100)
-    AutoAttackButton.Text = "Auto Attack: OFF"
-    AutoAttackButton.TextSize = 18
-    AutoAttackButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    AutoAttackButton.Parent = MainFrame
 
     -- Tombol Hop Server
     local HopServerButton = Instance.new("TextButton")
     HopServerButton.Size = UDim2.new(0.8, 0, 0, 40)
-    HopServerButton.Position = UDim2.new(0.1, 0, 0.6, 0)
+    HopServerButton.Position = UDim2.new(0.1, 0, 0.4, 0)
     HopServerButton.BackgroundColor3 = Color3.fromRGB(150, 100, 250)
     HopServerButton.Text = "Hop Server"
-    HopServerButton.TextSize = 18
-    HopServerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     HopServerButton.Parent = MainFrame
 
-    -- Fungsi Auto Farm
-    local autoFarmActive = false
-    AutoFarmButton.MouseButton1Click:Connect(function()
-        autoFarmActive = not autoFarmActive
-        if autoFarmActive then
-            AutoFarmButton.Text = "Auto Farm: ON"
-            AutoFarmButton.BackgroundColor3 = Color3.fromRGB(100, 250, 100)
-            while autoFarmActive do
-                local npc = getNearestNPC()
-                if npc then
-                    player.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
-                end
-                wait(0.5)
-            end
-        else
-            AutoFarmButton.Text = "Auto Farm: OFF"
-            AutoFarmButton.BackgroundColor3 = Color3.fromRGB(50, 150, 250)
-        end
-    end)
+    -- Tombol Salin Job ID
+    local CopyJobIDButton = Instance.new("TextButton")
+    CopyJobIDButton.Size = UDim2.new(0.8, 0, 0, 40)
+    CopyJobIDButton.Position = UDim2.new(0.1, 0, 0.6, 0)
+    CopyJobIDButton.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+    CopyJobIDButton.Text = "Salin Job ID"
+    CopyJobIDButton.Parent = MainFrame
 
-    -- Fungsi Auto Attack
-    local autoAttackActive = false
-    AutoAttackButton.MouseButton1Click:Connect(function()
-        autoAttackActive = not autoAttackActive
-        if autoAttackActive then
-            AutoAttackButton.Text = "Auto Attack: ON"
-            AutoAttackButton.BackgroundColor3 = Color3.fromRGB(100, 250, 100)
-            while autoAttackActive do
-                local npc = getNearestNPC()
-                if npc then
-                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Hit", npc)
-                end
-                wait(0.2)
-            end
-        else
-            AutoAttackButton.Text = "Auto Attack: OFF"
-            AutoAttackButton.BackgroundColor3 = Color3.fromRGB(250, 100, 100)
-        end
-    end)
+    -- Tombol Join Server dengan Job ID
+    local JoinJobIDButton = Instance.new("TextButton")
+    JoinJobIDButton.Size = UDim2.new(0.8, 0, 0, 40)
+    JoinJobIDButton.Position = UDim2.new(0.1, 0, 0.8, 0)
+    JoinJobIDButton.BackgroundColor3 = Color3.fromRGB(200, 100, 100)
+    JoinJobIDButton.Text = "Join via Job ID"
+    JoinJobIDButton.Parent = MainFrame
+
+    local JobIDInput = Instance.new("TextBox")
+    JobIDInput.Size = UDim2.new(0.8, 0, 0, 30)
+    JobIDInput.Position = UDim2.new(0.1, 0, 0.73, 0)
+    JobIDInput.PlaceholderText = "Masukkan Job ID"
+    JobIDInput.Text = ""
+    JobIDInput.Parent = MainFrame
 
     -- Fungsi Hop Server
     HopServerButton.MouseButton1Click:Connect(function()
@@ -168,20 +138,20 @@ function loadSuperCapyUI()
             end
         end
     end)
-end
 
--- Fungsi mencari musuh terdekat
-function getNearestNPC()
-    local nearestNPC = nil
-    local shortestDistance = math.huge
-    for _, npc in pairs(workspace.Enemies:GetChildren()) do
-        if npc:FindFirstChild("HumanoidRootPart") and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
-            local distance = (npc.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
-            if distance < shortestDistance then
-                shortestDistance = distance
-                nearestNPC = npc
-            end
+    -- Fungsi Salin Job ID
+    CopyJobIDButton.MouseButton1Click:Connect(function()
+        setclipboard(game.JobId)
+        print("Job ID telah disalin: " .. game.JobId)
+    end)
+
+    -- Fungsi Join Server via Job ID
+    JoinJobIDButton.MouseButton1Click:Connect(function()
+        local jobID = JobIDInput.Text
+        if jobID and jobID ~= "" then
+            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, jobID, player)
+        else
+            print("Masukkan Job ID yang valid!")
         end
-    end
-    return nearestNPC
+    end)
 end
