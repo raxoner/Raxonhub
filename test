@@ -4,69 +4,86 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame for UI
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 200)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
-mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+mainFrame.Size = UDim2.new(0, 400, 0, 250)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 2
+mainFrame.BorderColor3 = Color3.fromRGB(100, 100, 100)
 mainFrame.Parent = screenGui
 
--- Minimize Button
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Size = UDim2.new(0, 50, 0, 30)
-minimizeButton.Position = UDim2.new(0, 250, 0, 0)
-minimizeButton.Text = "-"
-minimizeButton.Parent = mainFrame
+-- Title Label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0, 400, 0, 50)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+titleLabel.Text = "Job ID Server Tools"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 24
+titleLabel.TextAlign = Enum.TextXAlignment.Center
+titleLabel.Parent = mainFrame
 
--- Close Button
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 50, 0, 30)
-closeButton.Position = UDim2.new(0, 250, 0, 30)
-closeButton.Text = "X"
-closeButton.Parent = mainFrame
+-- Job ID Display (for current job)
+local jobIdDisplayLabel = Instance.new("TextLabel")
+jobIdDisplayLabel.Size = UDim2.new(0, 300, 0, 40)
+jobIdDisplayLabel.Position = UDim2.new(0, 50, 0, 60)
+jobIdDisplayLabel.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+jobIdDisplayLabel.Text = "Current Job ID: " .. game.JobId
+jobIdDisplayLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+jobIdDisplayLabel.TextSize = 18
+jobIdDisplayLabel.TextWrapped = true
+jobIdDisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
+jobIdDisplayLabel.Parent = mainFrame
 
--- Job ID Copy Button
+-- Copy Job ID Button
 local copyJobButton = Instance.new("TextButton")
-copyJobButton.Size = UDim2.new(0, 200, 0, 50)
-copyJobButton.Position = UDim2.new(0, 50, 0, 60)
+copyJobButton.Size = UDim2.new(0, 150, 0, 40)
+copyJobButton.Position = UDim2.new(0, 50, 0, 120)
+copyJobButton.BackgroundColor3 = Color3.fromRGB(40, 120, 255)
 copyJobButton.Text = "Copy Job ID"
+copyJobButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+copyJobButton.TextSize = 18
 copyJobButton.Parent = mainFrame
 
--- Job ID Join Button
+-- Job ID Input Field for joining
+local jobIdInput = Instance.new("TextBox")
+jobIdInput.Size = UDim2.new(0, 300, 0, 40)
+jobIdInput.Position = UDim2.new(0, 50, 0, 170)
+jobIdInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+jobIdInput.Text = ""
+jobIdInput.PlaceholderText = "Enter Job ID to Join"
+jobIdInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+jobIdInput.TextSize = 18
+jobIdInput.ClearTextOnFocus = true
+jobIdInput.Parent = mainFrame
+
+-- Join Job Button
 local joinJobButton = Instance.new("TextButton")
-joinJobButton.Size = UDim2.new(0, 200, 0, 50)
-joinJobButton.Position = UDim2.new(0, 50, 0, 120)
+joinJobButton.Size = UDim2.new(0, 150, 0, 40)
+joinJobButton.Position = UDim2.new(0, 50, 0, 220)
+joinJobButton.BackgroundColor3 = Color3.fromRGB(40, 255, 120)
 joinJobButton.Text = "Join Job ID"
+joinJobButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+joinJobButton.TextSize = 18
 joinJobButton.Parent = mainFrame
 
--- Minimize Functionality
-local minimized = false
-minimizeButton.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    if minimized then
-        -- Minimize: Hide the content but keep the frame visible
-        mainFrame.Size = UDim2.new(0, 300, 0, 50)
-        copyJobButton.Visible = false
-        joinJobButton.Visible = false
-    else
-        -- Restore: Show the content again
-        mainFrame.Size = UDim2.new(0, 300, 0, 200)
-        copyJobButton.Visible = true
-        joinJobButton.Visible = true
-    end
-end)
-
--- Close Functionality
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()  -- This will delete the UI when the close button is clicked
-end)
-
--- Copy Job ID
+-- Function to Copy Job ID to Clipboard
 copyJobButton.MouseButton1Click:Connect(function()
     local jobId = game.JobId
-    setclipboard(jobId)  -- Copy job ID to clipboard
+    setclipboard(jobId)  -- Copy current job ID to clipboard
 end)
 
--- Join Job ID
+-- Function to Join Job ID
 joinJobButton.MouseButton1Click:Connect(function()
-    local jobId = game.JobId  -- Replace this with the Job ID you want to join
-    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, jobId, player)  -- Teleport to the server using Job ID
+    local enteredJobId = jobIdInput.Text
+    if enteredJobId ~= "" then
+        local success, message = pcall(function()
+            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, enteredJobId, player)
+        end)
+        
+        if not success then
+            warn("Failed to join Job ID: " .. message)
+        end
+    else
+        warn("Please enter a valid Job ID.")
+    end
 end)
