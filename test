@@ -1,121 +1,114 @@
--- Creating UI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 300, 0, 350)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -175)
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Frame.Parent = ScreenGui
+-- UI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
 
-local MinimizeButton = Instance.new("TextButton")
-MinimizeButton.Size = UDim2.new(0, 100, 0, 50)
-MinimizeButton.Position = UDim2.new(0, 0, 0, -50)
-MinimizeButton.Text = "Minimize"
-MinimizeButton.Parent = Frame
+-- Walk Speed Button
+local walkSpeedButton = Instance.new("TextButton")
+walkSpeedButton.Size = UDim2.new(0, 200, 0, 50)
+walkSpeedButton.Position = UDim2.new(0, 10, 0, 10)
+walkSpeedButton.Text = "Walk Speed: Off"
+walkSpeedButton.Parent = screenGui
 
-local RemoveButton = Instance.new("TextButton")
-RemoveButton.Size = UDim2.new(0, 100, 0, 50)
-RemoveButton.Position = UDim2.new(0, 200, 0, -50)
-RemoveButton.Text = "Remove"
-RemoveButton.Parent = Frame
+-- Flying Button
+local flyingButton = Instance.new("TextButton")
+flyingButton.Size = UDim2.new(0, 200, 0, 50)
+flyingButton.Position = UDim2.new(0, 10, 0, 70)
+flyingButton.Text = "Flying: Off"
+flyingButton.Parent = screenGui
 
-local CopyJobButton = Instance.new("TextButton")
-CopyJobButton.Size = UDim2.new(0, 200, 0, 50)
-CopyJobButton.Position = UDim2.new(0, 50, 0, 50)
-CopyJobButton.Text = "Copy Job ID"
-CopyJobButton.Parent = Frame
+-- Infinity Jump Button
+local infinityJumpButton = Instance.new("TextButton")
+infinityJumpButton.Size = UDim2.new(0, 200, 0, 50)
+infinityJumpButton.Position = UDim2.new(0, 10, 0, 130)
+infinityJumpButton.Text = "Infinite Jump: Off"
+infinityJumpButton.Parent = screenGui
 
-local JoinJobButton = Instance.new("TextButton")
-JoinJobButton.Size = UDim2.new(0, 200, 0, 50)
-JoinJobButton.Position = UDim2.new(0, 50, 0, 110)
-JoinJobButton.Text = "Join Job ID"
-JoinJobButton.Parent = Frame
+-- Job ID Copy Button
+local copyJobButton = Instance.new("TextButton")
+copyJobButton.Size = UDim2.new(0, 200, 0, 50)
+copyJobButton.Position = UDim2.new(0, 10, 0, 190)
+copyJobButton.Text = "Copy Job ID"
+copyJobButton.Parent = screenGui
 
-local WalkSpeedSlider = Instance.new("Slider")
-WalkSpeedSlider.Size = UDim2.new(0, 200, 0, 50)
-WalkSpeedSlider.Position = UDim2.new(0, 50, 0, 170)
-WalkSpeedSlider.MinValue = 10
-WalkSpeedSlider.MaxValue = 300
-WalkSpeedSlider.Text = "Walk Speed"
-WalkSpeedSlider.Parent = Frame
+-- Job ID Join Button
+local joinJobButton = Instance.new("TextButton")
+joinJobButton.Size = UDim2.new(0, 200, 0, 50)
+joinJobButton.Position = UDim2.new(0, 10, 0, 250)
+joinJobButton.Text = "Join Job ID"
+joinJobButton.Parent = screenGui
 
-local FlyHeightSlider = Instance.new("Slider")
-FlyHeightSlider.Size = UDim2.new(0, 200, 0, 50)
-FlyHeightSlider.Position = UDim2.new(0, 50, 0, 230)
-FlyHeightSlider.MinValue = 5
-FlyHeightSlider.MaxValue = 600
-FlyHeightSlider.Text = "Fly Height"
-FlyHeightSlider.Parent = Frame
-
-local OnOffButton = Instance.new("TextButton")
-OnOffButton.Size = UDim2.new(0, 200, 0, 50)
-OnOffButton.Position = UDim2.new(0, 50, 0, 290)
-OnOffButton.Text = "On/Off"
-OnOffButton.Parent = Frame
-
-local InfiniteJumpToggle = Instance.new("TextButton")
-InfiniteJumpToggle.Size = UDim2.new(0, 200, 0, 50)
-InfiniteJumpToggle.Position = UDim2.new(0, 50, 0, 350)
-InfiniteJumpToggle.Text = "Infinite Jump"
-InfiniteJumpToggle.Parent = Frame
-
-local minimized = false
-local jobID = "123456789"  -- Example Job ID
-local flying = false
-local infiniteJump = false
-
--- Minimize functionality
-MinimizeButton.MouseButton1Click:Connect(function()
-    if minimized then
-        Frame.Size = UDim2.new(0, 300, 0, 350)
-        MinimizeButton.Text = "Minimize"
+-- Walk Speed Control
+local walkSpeed = 16
+local walkSpeedEnabled = false  -- Default: Off
+walkSpeedButton.MouseButton1Click:Connect(function()
+    walkSpeedEnabled = not walkSpeedEnabled
+    if walkSpeedEnabled then
+        walkSpeedButton.Text = "Walk Speed: On"
+        player.Character.Humanoid.WalkSpeed = walkSpeed
     else
-        Frame.Size = UDim2.new(0, 300, 0, 50)
-        MinimizeButton.Text = "Restore"
-    end
-    minimized = not minimized
-end)
-
--- Remove functionality
-RemoveButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
--- Copy Job ID functionality
-CopyJobButton.MouseButton1Click:Connect(function()
-    setclipboard(jobID)
-    print("Job ID copied: " .. jobID)
-end)
-
--- Join Job ID functionality
-JoinJobButton.MouseButton1Click:Connect(function()
-    game:GetService("TeleportService"):Teleport(jobID)
-    print("Joining job with ID: " .. jobID)
-end)
-
--- Walk Speed Slider
-WalkSpeedSlider.Changed:Connect(function()
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = WalkSpeedSlider.Value
-end)
-
--- Fly Height Slider
-FlyHeightSlider.Changed:Connect(function()
-    if flying then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, FlyHeightSlider.Value, 0))
+        walkSpeedButton.Text = "Walk Speed: Off"
+        player.Character.Humanoid.WalkSpeed = 16  -- Reset to default speed
     end
 end)
 
--- On/Off Toggle
-OnOffButton.MouseButton1Click:Connect(function()
+-- Flying Mechanism
+local flying = false
+local bodyVelocity = Instance.new("BodyVelocity")
+flyingButton.MouseButton1Click:Connect(function()
     flying = not flying
-    OnOffButton.Text = flying and "Flying On" or "Flying Off"
+    if flying then
+        flyingButton.Text = "Flying: On"
+        local bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.Parent = player.Character:WaitForChild("HumanoidRootPart")
+        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+        bodyGyro.CFrame = player.Character.HumanoidRootPart.CFrame
+
+        bodyVelocity.Parent = player.Character:WaitForChild("HumanoidRootPart")
+        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+        bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Adjust velocity for flying
+    else
+        flyingButton.Text = "Flying: Off"
+        -- Stop flying and remove BodyVelocity and BodyGyro
+        bodyVelocity:Destroy()
+        bodyGyro:Destroy()
+    end
 end)
 
--- Infinite Jump Toggle
-InfiniteJumpToggle.MouseButton1Click:Connect(function()
-    infiniteJump = not infiniteJump
-    InfiniteJumpToggle.Text = infiniteJump and "Infinite Jump On" or "Infinite Jump Off"
-    local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
-    humanoid.JumpPower = infiniteJump and 100 or 50
+-- Infinity Jump Mechanism
+local jumping = false
+infinityJumpButton.MouseButton1Click:Connect(function()
+    jumping = not jumping
+    if jumping then
+        infinityJumpButton.Text = "Infinite Jump: On"
+        UIS.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Space then
+                local character = player.Character
+                if character and character:FindFirstChild("Humanoid") then
+                    character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+                    character.HumanoidRootPart.Velocity = Vector3.new(0, 50, 0)  -- Adjust jump height
+                end
+            end
+        end)
+    else
+        infinityJumpButton.Text = "Infinite Jump: Off"
+    end
 end)
+
+-- Copy Job ID
+copyJobButton.MouseButton1Click:Connect(function()
+    local jobId = game.JobId
+    setclipboard(jobId)  -- Copies job ID to clipboard
+end)
+
+-- Join Job ID
+joinJobButton.MouseButton1Click:Connect(function()
+    local jobId = game.JobId  -- Replace this with the Job ID you want to join
+    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, jobId, player)  -- Teleport to the server using Job ID
+end)
+
+-- Optional: Add UI animations or effects here (e.g., TweenService for smooth transitions)
