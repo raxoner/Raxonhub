@@ -54,6 +54,19 @@ LoginButton.Text = "Login"
 LoginButton.BackgroundColor3 = Color3.fromRGB(100, 250, 100)
 LoginButton.Parent = LoginFrame
 
+-- Tombol X untuk Menutup UI Login
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
+CloseButton.Text = "X"
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseButton.Parent = LoginFrame
+
+-- Fungsi untuk Menutup UI Login
+CloseButton.MouseButton1Click:Connect(function()
+    LoginGUI:Destroy()
+end)
+
 -- Fungsi Verifikasi Password
 local function verifyPassword()
     if PasswordBox.Text == savedPassword then
@@ -74,8 +87,8 @@ function loadSuperCapyUI()
     SuperCapyUI.Parent = playerGui
 
     local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 300, 0, 300)
-    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
+    MainFrame.Size = UDim2.new(0, 300, 0, 350)
+    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -175)
     MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     MainFrame.Parent = SuperCapyUI
 
@@ -96,62 +109,60 @@ function loadSuperCapyUI()
     AutoFarmButton.TextSize = 18
     AutoFarmButton.Parent = MainFrame
 
-    -- Tombol Hop Server
-    local HopServerButton = Instance.new("TextButton")
-    HopServerButton.Size = UDim2.new(0.8, 0, 0, 40)
-    HopServerButton.Position = UDim2.new(0.1, 0, 0.4, 0)
-    HopServerButton.BackgroundColor3 = Color3.fromRGB(150, 100, 250)
-    HopServerButton.Text = "Hop Server"
-    HopServerButton.Parent = MainFrame
+    -- Tombol Minimize UI
+    local MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Size = UDim2.new(0.2, 0, 0, 30)
+    MinimizeButton.Position = UDim2.new(0.8, 0, 0, 0)
+    MinimizeButton.Text = "_"
+    MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+    MinimizeButton.Parent = MainFrame
 
-    -- Tombol Salin Job ID
-    local CopyJobIDButton = Instance.new("TextButton")
-    CopyJobIDButton.Size = UDim2.new(0.8, 0, 0, 40)
-    CopyJobIDButton.Position = UDim2.new(0.1, 0, 0.6, 0)
-    CopyJobIDButton.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
-    CopyJobIDButton.Text = "Salin Job ID"
-    CopyJobIDButton.Parent = MainFrame
+    local minimized = false
 
-    -- Tombol Join Server dengan Job ID
-    local JoinJobIDButton = Instance.new("TextButton")
-    JoinJobIDButton.Size = UDim2.new(0.8, 0, 0, 40)
-    JoinJobIDButton.Position = UDim2.new(0.1, 0, 0.8, 0)
-    JoinJobIDButton.BackgroundColor3 = Color3.fromRGB(200, 100, 100)
-    JoinJobIDButton.Text = "Join via Job ID"
-    JoinJobIDButton.Parent = MainFrame
-
-    local JobIDInput = Instance.new("TextBox")
-    JobIDInput.Size = UDim2.new(0.8, 0, 0, 30)
-    JobIDInput.Position = UDim2.new(0.1, 0, 0.73, 0)
-    JobIDInput.PlaceholderText = "Masukkan Job ID"
-    JobIDInput.Text = ""
-    JobIDInput.Parent = MainFrame
-
-    -- Fungsi Hop Server
-    HopServerButton.MouseButton1Click:Connect(function()
-        local HttpService = game:GetService("HttpService")
-        local Servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
-        for _, server in pairs(Servers.data) do
-            if server.id ~= game.JobId and server.playing < server.maxPlayers then
-                game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, server.id, player)
-                break
-            end
-        end
-    end)
-
-    -- Fungsi Salin Job ID
-    CopyJobIDButton.MouseButton1Click:Connect(function()
-        setclipboard(game.JobId)
-        print("Job ID telah disalin: " .. game.JobId)
-    end)
-
-    -- Fungsi Join Server via Job ID
-    JoinJobIDButton.MouseButton1Click:Connect(function()
-        local jobID = JobIDInput.Text
-        if jobID and jobID ~= "" then
-            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, jobID, player)
+    -- Fungsi untuk Minimize UI
+    MinimizeButton.MouseButton1Click:Connect(function()
+        if minimized then
+            MainFrame.Size = UDim2.new(0, 300, 0, 350)
+            MinimizeButton.Text = "_"
         else
-            print("Masukkan Job ID yang valid!")
+            MainFrame.Size = UDim2.new(0, 300, 0, 30)
+            MinimizeButton.Text = "+"
+        end
+        minimized = not minimized
+    end)
+
+    -- Fungsi Auto Farm
+    local autoFarming = false
+    AutoFarmButton.MouseButton1Click:Connect(function()
+        autoFarming = not autoFarming
+        if autoFarming then
+            AutoFarmButton.Text = "Auto Farm: ON"
+            startAutoFarm()
+        else
+            AutoFarmButton.Text = "Auto Farm: OFF"
+            stopAutoFarm()
         end
     end)
+
+    -- Fungsi untuk menjalankan Auto Farm
+    function startAutoFarm()
+        -- Ganti dengan logika Auto Farm yang sesuai di sini
+        -- Misalnya, menggunakan karakter untuk memukul musuh secara otomatis
+        local enemy = game.Workspace:WaitForChild("Enemy") -- Ganti dengan objek musuh
+        while autoFarming do
+            -- Contoh tindakan otomatis
+            if enemy and enemy:FindFirstChild("Humanoid") then
+                player.Character:MoveTo(enemy.HumanoidRootPart.Position)
+                wait(0.5) -- Tunggu setengah detik sebelum menyerang lagi
+                fireclickdetector(enemy:FindFirstChildOfClass("ClickDetector"))
+            end
+            wait(1) -- Jeda antar aksi
+        end
+    end
+
+    -- Fungsi untuk menghentikan Auto Farm
+    function stopAutoFarm()
+        -- Berhenti melakukan auto farm jika diperlukan
+        -- Kamu bisa menambahkan logika tambahan di sini
+    end
 end
