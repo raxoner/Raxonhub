@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
-
 local player = Players.LocalPlayer
 local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
 
@@ -92,6 +91,29 @@ welcomeNotification.Parent = frame
 wait(5)
 welcomeNotification:Destroy()
 
+-- Fitur Jam (Waktu di Negara Tertentu)
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Text = "Waktu: " .. os.date("%X")  -- Menampilkan waktu dalam format 24-jam
+timeLabel.Size = UDim2.new(1, -20, 0, 30)
+timeLabel.Position = UDim2.new(0, 10, 0, 310)
+timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+timeLabel.BackgroundTransparency = 1
+timeLabel.Font = Enum.Font.SourceSans
+timeLabel.TextSize = 18
+timeLabel.Parent = frame
+
+-- Fungsi untuk Memperbarui Waktu
+local function updateTime()
+    while true do
+        local currentTime = os.date("%X")  -- Format waktu 24-jam
+        timeLabel.Text = "Waktu: " .. currentTime
+        wait(1)  -- Update setiap detik
+    end
+end
+
+-- Menjalankan update waktu
+spawn(updateTime)
+
 -- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
@@ -104,6 +126,7 @@ minimizeButton.MouseButton1Click:Connect(function()
         hopServerButton.Visible = true
         rejoinButton.Visible = true
         jobIdTextBox.Visible = true
+        timeLabel.Visible = true
     else
         -- Minimize frame dan sembunyikan semua elemen
         frame.Size = UDim2.new(0, 350, 0, 30)
@@ -113,6 +136,7 @@ minimizeButton.MouseButton1Click:Connect(function()
         hopServerButton.Visible = false
         rejoinButton.Visible = false
         jobIdTextBox.Visible = false
+        timeLabel.Visible = false
     end
     minimized = not minimized
 end)
