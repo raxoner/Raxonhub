@@ -187,3 +187,30 @@ end
 
 -- Jalankan pengecekan pembaruan saat script berjalan
 spawn(checkForUpdates)
+
+-- Fitur Dragging (Geser UI)
+local dragging, dragInput, mousePos, framePos
+
+local function updatePosition(input)
+    local delta = input.Position - mousePos
+    frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+end
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        mousePos = input.Position
+        framePos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        updatePosition(input)
+    end
+end)
