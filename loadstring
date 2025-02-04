@@ -117,14 +117,14 @@ rejoinButton.MouseButton1Click:Connect(function()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
 end)
 
--- Fitur Drag untuk menggeser UI
+-- Fitur Drag untuk menggeser UI di HP
 local dragging = false
 local dragStart = Vector2.new()
 local startPos = Vector2.new()
 
 -- Menambahkan area yang bisa di-drag (klik untuk memulai drag)
 frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragStart = input.Position
         startPos = frame.Position
@@ -132,14 +132,30 @@ frame.InputBegan:Connect(function(input)
 end)
 
 frame.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStart
         frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
 frame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
     end
 end)
+
+-- Fungsi Anti Staff (Deteksi Jika Pemain Adalah Staf)
+local function checkIfStaff()
+    local staffUserIds = {
+        -- Daftar UserID staf, tambahkan User ID pemain yang diketahui staf di sini
+        123456789, 987654321
+    }
+
+    if table.find(staffUserIds, player.UserId) then
+        print("Pemain ini adalah staf! Tidak bisa menggunakan fitur tertentu.")
+        -- Anda bisa menambahkan tindakan lebih lanjut seperti menghentikan akses fitur tertentu
+    end
+end
+
+-- Menjalankan fungsi Anti Staff saat UI diinisialisasi
+checkIfStaff()
