@@ -14,12 +14,21 @@ frame.Position = UDim2.new(0.5, -175, 0.5, -175)
 frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
 frame.Parent = screenGui
 
+-- Tombol Minimize
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Text = "−"
 minimizeButton.Size = UDim2.new(0, 30, 0, 30)
 minimizeButton.Position = UDim2.new(1, -35, 0, 5)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 minimizeButton.Parent = frame
+
+-- Tombol Hapus UI (X)
+local removeUIButton = Instance.new("TextButton")
+removeUIButton.Text = "X"
+removeUIButton.Size = UDim2.new(0, 30, 0, 30)
+removeUIButton.Position = UDim2.new(1, -70, 0, 5)  -- Posisi X sedikit lebih ke kiri dari minimize
+removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+removeUIButton.Parent = frame
 
 local copyJobButton = Instance.new("TextButton")
 copyJobButton.Text = "Copy Job ID"
@@ -57,6 +66,17 @@ jobIdTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 jobIdTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 jobIdTextBox.Parent = frame
 
+-- Logo Text S
+local logoText = Instance.new("TextLabel")
+logoText.Text = "S"
+logoText.Size = UDim2.new(0, 30, 0, 30)
+logoText.Position = UDim2.new(0, 10, 0, 5)
+logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+logoText.BackgroundTransparency = 1
+logoText.Font = Enum.Font.SourceSansBold
+logoText.TextSize = 24
+logoText.Parent = frame
+
 -- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
@@ -80,6 +100,17 @@ minimizeButton.MouseButton1Click:Connect(function()
         jobIdTextBox.Visible = false
     end
     minimized = not minimized
+end)
+
+-- Fungsi Hapus UI Selamanya
+local function removeUI()
+    screenGui:Destroy()
+    print("UI telah dihapus selamanya.")
+end
+
+-- Tombol untuk Hapus UI Selamanya
+removeUIButton.MouseButton1Click:Connect(function()
+    removeUI()
 end)
 
 -- Fungsi Copy Job ID ke Clipboard
