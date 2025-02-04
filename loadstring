@@ -66,10 +66,10 @@ jobIdTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 jobIdTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 jobIdTextBox.Parent = frame
 
--- Logo Text S
+-- Logo Text Capy Helper
 local logoText = Instance.new("TextLabel")
-logoText.Text = "S"
-logoText.Size = UDim2.new(0, 30, 0, 30)
+logoText.Text = "Capy Helper"
+logoText.Size = UDim2.new(0, 100, 0, 30)
 logoText.Position = UDim2.new(0, 10, 0, 5)
 logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
 logoText.BackgroundTransparency = 1
