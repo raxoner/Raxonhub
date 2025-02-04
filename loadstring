@@ -173,7 +173,7 @@ end
 -- Jalankan Anti-AFK
 spawn(preventAFK)
 
--- Fungsi Auto-Update
+-- Fitur Auto-Update
 local function checkForUpdates()
     local latestVersion = "1.0.0"  -- Ganti dengan versi terbaru dari file script atau server
     local currentVersion = "0.9.0"  -- Versi saat ini
