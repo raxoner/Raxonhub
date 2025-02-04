@@ -1,8 +1,10 @@
+-- Layanan yang dibutuhkan
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
+local clipboard = game:GetService("Clipboard")
 
--- UI
+-- UI Setup
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
@@ -14,13 +16,13 @@ frame.Active = true
 frame.Draggable = false
 frame.Parent = screenGui
 
--- Header (untuk drag UI)
+-- Header for drag UI
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 30)
 header.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
 header.Parent = frame
 
--- Logo Text Capy Helper
+-- Logo Text
 local logoText = Instance.new("TextLabel")
 logoText.Text = "Capy Helper"
 logoText.Size = UDim2.new(0, 150, 0, 30)
@@ -31,7 +33,7 @@ logoText.Font = Enum.Font.SourceSansBold
 logoText.TextSize = 22
 logoText.Parent = header
 
--- Tombol Minimize
+-- Minimize Button
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Text = "−"
 minimizeButton.Size = UDim2.new(0, 30, 0, 30)
@@ -40,7 +42,7 @@ minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizeButton.Parent = header
 
--- Tombol Hapus UI (X)
+-- Close Button (X)
 local removeUIButton = Instance.new("TextButton")
 removeUIButton.Text = "X"
 removeUIButton.Size = UDim2.new(0, 30, 0, 30)
@@ -49,7 +51,7 @@ removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 removeUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 removeUIButton.Parent = header
 
--- Tombol Hop Server
+-- Hop Server Button
 local hopServerButton = Instance.new("TextButton")
 hopServerButton.Text = "Hop Server"
 hopServerButton.Size = UDim2.new(0, 150, 0, 40)
@@ -58,7 +60,7 @@ hopServerButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 hopServerButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 hopServerButton.Parent = frame
 
--- Tombol Rejoin Server
+-- Rejoin Server Button
 local rejoinButton = Instance.new("TextButton")
 rejoinButton.Text = "Rejoin Server"
 rejoinButton.Size = UDim2.new(0, 150, 0, 40)
@@ -67,14 +69,41 @@ rejoinButton.BackgroundColor3 = Color3.fromRGB(0, 200, 200)
 rejoinButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 rejoinButton.Parent = frame
 
--- Fitur Dragging (Geser UI di HP & PC)
+-- Input for Job ID to join a server
+local jobIDTextBox = Instance.new("TextBox")
+jobIDTextBox.Size = UDim2.new(0, 200, 0, 40)
+jobIDTextBox.Position = UDim2.new(0.5, -100, 0, 150)
+jobIDTextBox.PlaceholderText = "Enter Job ID"
+jobIDTextBox.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+jobIDTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+jobIDTextBox.Parent = frame
+
+-- Button to Join Server by Job ID
+local joinJobIDButton = Instance.new("TextButton")
+joinJobIDButton.Text = "Join Server by Job ID"
+joinJobIDButton.Size = UDim2.new(0, 200, 0, 40)
+joinJobIDButton.Position = UDim2.new(0.5, -100, 0, 200)
+joinJobIDButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+joinJobIDButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+joinJobIDButton.Parent = frame
+
+-- Copy Job ID Button
+local copyJobIDButton = Instance.new("TextButton")
+copyJobIDButton.Text = "Copy Job ID"
+copyJobIDButton.Size = UDim2.new(0, 150, 0, 40)
+copyJobIDButton.Position = UDim2.new(0.5, -75, 0, 250)
+copyJobIDButton.BackgroundColor3 = Color3.fromRGB(255, 150, 0)
+copyJobIDButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+copyJobIDButton.Parent = frame
+
+-- Dragging functionality (for both PC and mobile)
 local dragging = false
 local dragInput, mousePos, framePos
 
 local function updatePosition(input)
     local delta = input.Position - mousePos
     frame.Position = UDim2.new(
-        framePos.X.Scale, framePos.X.Offset + delta.X, 
+        framePos.X.Scale, framePos.X.Offset + delta.X,
         framePos.Y.Scale, framePos.Y.Offset + delta.Y
     )
 end
@@ -84,7 +113,7 @@ header.InputBegan:Connect(function(input)
         dragging = true
         mousePos = input.Position
         framePos = frame.Position
-        
+
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 dragging = false
@@ -99,11 +128,11 @@ header.InputChanged:Connect(function(input)
     end
 end)
 
--- Fungsi Hop Server
+-- Hop Server Function
 hopServerButton.MouseButton1Click:Connect(function()
-    local servers = {}  
+    local servers = {}
     local req = syn.request({
-        Url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100",
+        Url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100",
         Method = "GET"
     })
 
@@ -124,20 +153,37 @@ hopServerButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Fungsi Rejoin Server
+-- Rejoin Server Function
 rejoinButton.MouseButton1Click:Connect(function()
     TeleportService:Teleport(game.PlaceId, player)
 end)
 
--- Fungsi Anti AFK
-local virtualUser = game:GetService("VirtualUser")
-game.Players.LocalPlayer.Idled:Connect(function()
-    virtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-    wait(1)
-    virtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+-- Join Server by Job ID Function
+joinJobIDButton.MouseButton1Click:Connect(function()
+    local jobID = jobIDTextBox.Text
+    if jobID ~= "" then
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobID, player)
+    else
+        print("Masukkan Job ID yang valid.")
+    end
 end)
 
--- Fungsi Minimize UI
+-- Copy Job ID to Clipboard
+copyJobIDButton.MouseButton1Click:Connect(function()
+    local jobID = game.JobId
+    clipboard:Set(jobID)
+    print("Job ID telah disalin ke clipboard.")
+end)
+
+-- Anti AFK
+local virtualUser = game:GetService("VirtualUser")
+game.Players.LocalPlayer.Idled:Connect(function()
+    virtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+    wait(1)
+    virtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+end)
+
+-- Minimize UI Function
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     if minimized then
@@ -150,7 +196,7 @@ minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
 end)
 
--- Fungsi Hapus UI
+-- Remove UI Function (X)
 removeUIButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
     print("UI telah dihapus selamanya.")
