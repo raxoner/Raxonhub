@@ -88,6 +88,10 @@ welcomeNotification.Font = Enum.Font.SourceSans
 welcomeNotification.TextSize = 18
 welcomeNotification.Parent = frame
 
+-- Menampilkan notifikasi selama 5 detik
+wait(5)
+welcomeNotification:Destroy()
+
 -- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
@@ -183,25 +187,3 @@ end
 
 -- Jalankan pengecekan pembaruan saat script berjalan
 spawn(checkForUpdates)
-
--- Pengaturan Tema: Pilihan Tema Gelap atau Terang
-local isDarkMode = true  -- Ganti dengan pilihan dari pengguna
-
-local function setTheme()
-    if isDarkMode then
-        frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  -- Gelap
-        copyJobButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        joinJobButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        hopServerButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        rejoinButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    else
-        frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Terang
-        copyJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-        joinJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-        hopServerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-        rejoinButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-    end
-end
-
--- Jalankan pengaturan tema saat script dimulai
-setTheme()
