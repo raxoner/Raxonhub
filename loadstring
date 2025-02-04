@@ -1,9 +1,11 @@
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
-local player = Players.LocalPlayer
-local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
+local UserInputService = game:GetService("UserInputService")
 
--- Membuat UI jika belum ada
+local player = Players.LocalPlayer
+local jobId = game.JobId
+
+-- Membuat UI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
@@ -11,6 +13,8 @@ local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 350, 0, 350)
 frame.Position = UDim2.new(0.5, -175, 0.5, -175)
 frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
+frame.Active = true
+frame.Draggable = false  -- Kita akan membuat sistem drag sendiri
 frame.Parent = screenGui
 
 -- Tombol Minimize
@@ -25,50 +29,14 @@ minimizeButton.Parent = frame
 local removeUIButton = Instance.new("TextButton")
 removeUIButton.Text = "X"
 removeUIButton.Size = UDim2.new(0, 30, 0, 30)
-removeUIButton.Position = UDim2.new(1, -70, 0, 5)  -- Posisi X sedikit lebih ke kiri dari minimize
+removeUIButton.Position = UDim2.new(1, -70, 0, 5)
 removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 removeUIButton.Parent = frame
-
-local copyJobButton = Instance.new("TextButton")
-copyJobButton.Text = "Copy Job ID"
-copyJobButton.Size = UDim2.new(1, -20, 0, 40)
-copyJobButton.Position = UDim2.new(0, 10, 0, 40)
-copyJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-copyJobButton.Parent = frame
-
-local joinJobButton = Instance.new("TextButton")
-joinJobButton.Text = "Join by Job ID"
-joinJobButton.Size = UDim2.new(1, -20, 0, 40)
-joinJobButton.Position = UDim2.new(0, 10, 0, 90)
-joinJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-joinJobButton.Parent = frame
-
-local hopServerButton = Instance.new("TextButton")
-hopServerButton.Text = "Hop Server"
-hopServerButton.Size = UDim2.new(1, -20, 0, 40)
-hopServerButton.Position = UDim2.new(0, 10, 0, 140)
-hopServerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-hopServerButton.Parent = frame
-
-local rejoinButton = Instance.new("TextButton")
-rejoinButton.Text = "Rejoin Server"
-rejoinButton.Size = UDim2.new(1, -20, 0, 40)
-rejoinButton.Position = UDim2.new(0, 10, 0, 190)
-rejoinButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-rejoinButton.Parent = frame
-
-local jobIdTextBox = Instance.new("TextBox")
-jobIdTextBox.Size = UDim2.new(1, -20, 0, 30)
-jobIdTextBox.Position = UDim2.new(0, 10, 0, 240)
-jobIdTextBox.Text = "Masukkan Job ID"
-jobIdTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-jobIdTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-jobIdTextBox.Parent = frame
 
 -- Logo Text Capy Helper
 local logoText = Instance.new("TextLabel")
 logoText.Text = "Capy Helper"
-logoText.Size = UDim2.new(0, 100, 0, 30)
+logoText.Size = UDim2.new(0, 150, 0, 30)
 logoText.Position = UDim2.new(0, 10, 0, 5)
 logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
 logoText.BackgroundTransparency = 1
@@ -76,155 +44,24 @@ logoText.Font = Enum.Font.SourceSansBold
 logoText.TextSize = 24
 logoText.Parent = frame
 
--- Notifikasi Selamat Datang
-local welcomeNotification = Instance.new("TextLabel")
-welcomeNotification.Text = "Selamat datang, " .. player.Name
-welcomeNotification.Size = UDim2.new(1, -20, 0, 30)
-welcomeNotification.Position = UDim2.new(0, 10, 0, 275)
-welcomeNotification.TextColor3 = Color3.fromRGB(255, 255, 255)
-welcomeNotification.BackgroundTransparency = 1
-welcomeNotification.Font = Enum.Font.SourceSans
-welcomeNotification.TextSize = 18
-welcomeNotification.Parent = frame
-
--- Menampilkan notifikasi selama 5 detik
-wait(5)
-welcomeNotification:Destroy()
-
--- Fitur Jam (Waktu di Negara Tertentu)
-local timeLabel = Instance.new("TextLabel")
-timeLabel.Text = "Waktu: " .. os.date("%X")  -- Menampilkan waktu dalam format 24-jam
-timeLabel.Size = UDim2.new(1, -20, 0, 30)
-timeLabel.Position = UDim2.new(0, 10, 0, 310)
-timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-timeLabel.BackgroundTransparency = 1
-timeLabel.Font = Enum.Font.SourceSans
-timeLabel.TextSize = 18
-timeLabel.Parent = frame
-
--- Fungsi untuk Memperbarui Waktu
-local function updateTime()
-    while true do
-        local currentTime = os.date("%X")  -- Format waktu 24-jam
-        timeLabel.Text = "Waktu: " .. currentTime
-        wait(1)  -- Update setiap detik
-    end
-end
-
--- Menjalankan update waktu
-spawn(updateTime)
-
--- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
-local minimized = false
-minimizeButton.MouseButton1Click:Connect(function()
-    if minimized then
-        -- Restore frame size dan tampilkan kembali semua elemen
-        frame.Size = UDim2.new(0, 350, 0, 350)
-        minimizeButton.Text = "−"
-        copyJobButton.Visible = true
-        joinJobButton.Visible = true
-        hopServerButton.Visible = true
-        rejoinButton.Visible = true
-        jobIdTextBox.Visible = true
-        timeLabel.Visible = true
-    else
-        -- Minimize frame dan sembunyikan semua elemen
-        frame.Size = UDim2.new(0, 350, 0, 30)
-        minimizeButton.Text = "+"
-        copyJobButton.Visible = false
-        joinJobButton.Visible = false
-        hopServerButton.Visible = false
-        rejoinButton.Visible = false
-        jobIdTextBox.Visible = false
-        timeLabel.Visible = false
-    end
-    minimized = not minimized
-end)
-
--- Tombol untuk Hapus UI Selamanya
-local function removeUI()
-    screenGui:Destroy()
-    print("UI telah dihapus selamanya.")
-end
-
-removeUIButton.MouseButton1Click:Connect(function()
-    removeUI()
-end)
-
--- Fungsi Copy Job ID ke Clipboard
-copyJobButton.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(jobId)
-        print("Job ID disalin:", jobId)
-    else
-        print("Executor tidak mendukung setclipboard.")
-    end
-end)
-
--- Fungsi Join ke Server dengan Job ID
-joinJobButton.MouseButton1Click:Connect(function()
-    local jobInput = jobIdTextBox.Text
-    if jobInput and jobInput ~= "" then
-        print("Mencoba join server dengan Job ID:", jobInput)
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobInput, player)
-    else
-        print("Masukkan Job ID terlebih dahulu!")
-    end
-end)
-
--- Fungsi Hop Server (Pindah Server Acak)
-hopServerButton.MouseButton1Click:Connect(function()
-    local servers = TeleportService:GetTeleportSetting("Servers")  -- Mendapatkan daftar server
-    local randomServer = servers[math.random(1, #servers)]  -- Memilih server acak
-    print("Mencoba hop ke server baru...")
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
-end)
-
--- Fungsi Rejoin Server (Kembali ke Server yang Sama)
-rejoinButton.MouseButton1Click:Connect(function()
-    print("Mencoba rejoin ke server yang sama...")
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
-end)
-
--- Fitur Anti AFK
-local function preventAFK()
-    while true do
-        game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("!")
-        wait(30)  -- Kirim pesan setiap 30 detik untuk menjaga agar tidak AFK
-    end
-end
-
--- Jalankan Anti-AFK
-spawn(preventAFK)
-
--- Fitur Auto-Update
-local function checkForUpdates()
-    local latestVersion = "1.0.0"  -- Ganti dengan versi terbaru dari file script atau server
-    local currentVersion = "0.9.0"  -- Versi saat ini
-
-    if latestVersion > currentVersion then
-        print("Ada pembaruan baru! Mengunduh update...")
-        -- Menambahkan fitur untuk mendownload dan memperbarui script
-        -- Bisa menggunakan HTTPRequest untuk mengunduh file baru
-    end
-end
-
--- Jalankan pengecekan pembaruan saat script berjalan
-spawn(checkForUpdates)
-
--- Fitur Dragging (Geser UI)
-local dragging, dragInput, mousePos, framePos
+-- Fitur Dragging (Geser UI di PC & HP)
+local dragging = false
+local dragInput, mousePos, framePos
 
 local function updatePosition(input)
     local delta = input.Position - mousePos
-    frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+    frame.Position = UDim2.new(
+        framePos.X.Scale, framePos.X.Offset + delta.X, 
+        framePos.Y.Scale, framePos.Y.Offset + delta.Y
+    )
 end
 
 frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         mousePos = input.Position
         framePos = frame.Position
+        
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 dragging = false
@@ -234,7 +71,26 @@ frame.InputBegan:Connect(function(input)
 end)
 
 frame.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         updatePosition(input)
     end
+end)
+
+-- Fungsi Minimize UI
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    if minimized then
+        frame.Size = UDim2.new(0, 350, 0, 350)
+        minimizeButton.Text = "−"
+    else
+        frame.Size = UDim2.new(0, 350, 0, 30)
+        minimizeButton.Text = "+"
+    end
+    minimized = not minimized
+end)
+
+-- Fungsi Hapus UI
+removeUIButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+    print("UI telah dihapus selamanya.")
 end)
