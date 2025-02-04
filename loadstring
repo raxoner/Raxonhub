@@ -1,1 +1,62 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/raxoner/superstarscript1826838/refs/heads/main/nothing%20hub"))()
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+
+local player = Players.LocalPlayer
+local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
+
+-- GUI Elements
+local frame = script.Parent
+local minimizeButton = frame:FindFirstChild("MinimizeButton")
+local copyJobButton = frame:FindFirstChild("CopyJobButton")
+local joinJobButton = frame:FindFirstChild("JoinJobButton")
+local jobIdTextBox = frame:FindFirstChild("JobIdTextBox")
+local gameLogo = frame:FindFirstChild("GameLogo")
+local scanPlayerButton = frame:FindFirstChild("ScanPlayerButton")
+local playerListBox = frame:FindFirstChild("PlayerListBox") -- Tempat menampilkan pemain
+
+-- Menetapkan gambar logo (Gunung) - Ganti dengan ID Decal yang diinginkan
+gameLogo.Image = "rbxassetid://12345678"  -- Ganti dengan Decal ID Gambar Gunung
+
+-- Fungsi Minimize/Restore UI
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    if minimized then
+        frame.Size = UDim2.new(0, 300, 0, 250)  -- Kembali ke ukuran asli
+        minimizeButton.Text = "−"
+    else
+        frame.Size = UDim2.new(0, 300, 0, 30)  -- Minimize ukuran frame
+        minimizeButton.Text = "+"
+    end
+    minimized = not minimized
+end)
+
+-- Fungsi untuk Menyalin Job ID ke Clipboard
+copyJobButton.MouseButton1Click:Connect(function()
+    setclipboard(jobId)  -- Hanya bekerja di executor yang mendukung
+    print("Job ID telah disalin:", jobId)
+end)
+
+-- Fungsi untuk Bergabung ke Server dengan Job ID
+joinJobButton.MouseButton1Click:Connect(function()
+    local jobInput = jobIdTextBox.Text
+    if jobInput and jobInput ~= "" then
+        print("Mencoba join server dengan Job ID:", jobInput)
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobInput, player)
+    else
+        print("Masukkan Job ID terlebih dahulu!")
+    end
+end)
+
+-- Fungsi untuk Scan Daftar Pemain di Server
+scanPlayerButton.MouseButton1Click:Connect(function()
+    playerListBox:ClearAllChildren()  -- Bersihkan daftar sebelumnya
+    
+    for _, p in pairs(Players:GetPlayers()) do
+        local playerLabel = Instance.new("TextLabel")
+        playerLabel.Text = p.Name
+        playerLabel.Size = UDim2.new(1, 0, 0, 20)
+        playerLabel.Parent = playerListBox
+    end
+    
+    print("Scan selesai, menampilkan daftar pemain.")
+end)
