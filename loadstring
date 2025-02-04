@@ -4,47 +4,77 @@ local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local jobId = game.JobId
+local adminList = {"Admin", "Moderator", "Staff", "Owner"} -- Nama role admin
 
--- Membuat UI
+-- UI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 350)
-frame.Position = UDim2.new(0.5, -175, 0.5, -175)
-frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
+frame.Size = UDim2.new(0, 350, 0, 300)
+frame.Position = UDim2.new(0.5, -175, 0.5, -150)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Warna abu-abu gelap
+frame.BackgroundTransparency = 0.1 -- Lebih transparan agar enak dilihat
 frame.Active = true
-frame.Draggable = false  -- Kita akan membuat sistem drag sendiri
+frame.Draggable = false
 frame.Parent = screenGui
 
--- Tombol Minimize
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Text = "−"
-minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-minimizeButton.Position = UDim2.new(1, -35, 0, 5)
-minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-minimizeButton.Parent = frame
-
--- Tombol Hapus UI (X)
-local removeUIButton = Instance.new("TextButton")
-removeUIButton.Text = "X"
-removeUIButton.Size = UDim2.new(0, 30, 0, 30)
-removeUIButton.Position = UDim2.new(1, -70, 0, 5)
-removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-removeUIButton.Parent = frame
+-- Header (untuk drag UI)
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 30)
+header.BackgroundColor3 = Color3.fromRGB(0, 122, 255) -- Warna biru untuk header
+header.Parent = frame
 
 -- Logo Text Capy Helper
 local logoText = Instance.new("TextLabel")
 logoText.Text = "Capy Helper"
 logoText.Size = UDim2.new(0, 150, 0, 30)
-logoText.Position = UDim2.new(0, 10, 0, 5)
+logoText.Position = UDim2.new(0, 10, 0, 0)
 logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
 logoText.BackgroundTransparency = 1
 logoText.Font = Enum.Font.SourceSansBold
-logoText.TextSize = 24
-logoText.Parent = frame
+logoText.TextSize = 22
+logoText.Parent = header
 
--- Fitur Dragging (Geser UI di PC & HP)
+-- Tombol Minimize
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Text = "−"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -35, 0, 0)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.Parent = header
+
+-- Tombol Hapus UI (X)
+local removeUIButton = Instance.new("TextButton")
+removeUIButton.Text = "X"
+removeUIButton.Size = UDim2.new(0, 30, 0, 30)
+removeUIButton.Position = UDim2.new(1, -70, 0, 0)
+removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+removeUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+removeUIButton.Parent = header
+
+-- Tombol Scan Player
+local scanButton = Instance.new("TextButton")
+scanButton.Text = "Scan Player"
+scanButton.Size = UDim2.new(0, 150, 0, 40)
+scanButton.Position = UDim2.new(0.5, -75, 0, 50)
+scanButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+scanButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+scanButton.Parent = frame
+
+-- Label Hasil Scan
+local scanResults = Instance.new("TextLabel")
+scanResults.Text = "Menunggu scan..."
+scanResults.Size = UDim2.new(1, -20, 0, 200)
+scanResults.Position = UDim2.new(0, 10, 0, 100)
+scanResults.TextColor3 = Color3.fromRGB(255, 255, 255)
+scanResults.BackgroundTransparency = 1
+scanResults.TextWrapped = true
+scanResults.TextXAlignment = Enum.TextXAlignment.Left
+scanResults.Parent = frame
+
+-- Fitur Dragging (Geser UI di HP & PC)
 local dragging = false
 local dragInput, mousePos, framePos
 
@@ -56,7 +86,7 @@ local function updatePosition(input)
     )
 end
 
-frame.InputBegan:Connect(function(input)
+header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         mousePos = input.Position
@@ -70,17 +100,59 @@ frame.InputBegan:Connect(function(input)
     end
 end)
 
-frame.InputChanged:Connect(function(input)
+header.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         updatePosition(input)
     end
 end)
 
+-- Fungsi Scan Player
+local function scanPlayers()
+    local resultText = "🔎 **Hasil Scan Player:**\n"
+    local adminDetected = false
+
+    for _, v in pairs(Players:GetPlayers()) do
+        local username = v.Name
+        local displayName = v.DisplayName
+        resultText = resultText .. "- " .. displayName .. " (" .. username .. ")\n"
+
+        -- Cek apakah pemain adalah admin/staff
+        for _, adminRole in pairs(adminList) do
+            if string.find(string.lower(displayName), string.lower(adminRole)) or string.find(string.lower(username), string.lower(adminRole)) then
+                resultText = resultText .. "**⚠ ADMIN DETECTED!**\n"
+                adminDetected = true
+            end
+        end
+    end
+
+    scanResults.Text = resultText
+
+    -- Jika ada admin, langsung keluar server
+    if adminDetected then
+        scanResults.Text = scanResults.Text .. "\n🚨 **Admin terdeteksi! Auto keluar...** 🚨"
+        wait(2)
+        TeleportService:Teleport(game.PlaceId, player)
+    end
+end
+
+-- Fungsi Auto Scan Setiap 10 Detik
+local function autoScan()
+    while wait(10) do
+        scanPlayers()
+    end
+end
+
+-- Jalankan scan otomatis
+spawn(autoScan)
+
+-- Event Saat Tombol Scan Ditekan
+scanButton.MouseButton1Click:Connect(scanPlayers)
+
 -- Fungsi Minimize UI
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     if minimized then
-        frame.Size = UDim2.new(0, 350, 0, 350)
+        frame.Size = UDim2.new(0, 350, 0, 300)
         minimizeButton.Text = "−"
     else
         frame.Size = UDim2.new(0, 350, 0, 30)
