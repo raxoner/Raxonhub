@@ -4,39 +4,76 @@ local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
 
--- GUI Elements
-local frame = script.Parent
-local minimizeButton = frame:FindFirstChild("MinimizeButton")
-local copyJobButton = frame:FindFirstChild("CopyJobButton")
-local joinJobButton = frame:FindFirstChild("JoinJobButton")
-local jobIdTextBox = frame:FindFirstChild("JobIdTextBox")
-local gameLogo = frame:FindFirstChild("GameLogo")
-local scanPlayerButton = frame:FindFirstChild("ScanPlayerButton")
-local playerListBox = frame:FindFirstChild("PlayerListBox") -- Tempat menampilkan pemain
+-- Membuat UI jika belum ada
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.CoreGui
 
--- Menetapkan gambar logo (Gunung) - Ganti dengan ID Decal yang diinginkan
-gameLogo.Image = "rbxassetid://12345678"  -- Ganti dengan Decal ID Gambar Gunung
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 250)
+frame.Position = UDim2.new(0.5, -150, 0.5, -125)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Parent = screenGui
 
--- Fungsi Minimize/Restore UI
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Text = "−"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -35, 0, 5)
+minimizeButton.Parent = frame
+
+local copyJobButton = Instance.new("TextButton")
+copyJobButton.Text = "Copy Job ID"
+copyJobButton.Size = UDim2.new(1, -20, 0, 40)
+copyJobButton.Position = UDim2.new(0, 10, 0, 40)
+copyJobButton.Parent = frame
+
+local joinJobButton = Instance.new("TextButton")
+joinJobButton.Text = "Join by Job ID"
+joinJobButton.Size = UDim2.new(1, -20, 0, 40)
+joinJobButton.Position = UDim2.new(0, 10, 0, 90)
+joinJobButton.Parent = frame
+
+local jobIdTextBox = Instance.new("TextBox")
+jobIdTextBox.Size = UDim2.new(1, -20, 0, 30)
+jobIdTextBox.Position = UDim2.new(0, 10, 0, 140)
+jobIdTextBox.Text = "Masukkan Job ID"
+jobIdTextBox.Parent = frame
+
+local scanPlayerButton = Instance.new("TextButton")
+scanPlayerButton.Text = "Scan Players"
+scanPlayerButton.Size = UDim2.new(1, -20, 0, 40)
+scanPlayerButton.Position = UDim2.new(0, 10, 0, 180)
+scanPlayerButton.Parent = frame
+
+local playerListBox = Instance.new("ScrollingFrame")
+playerListBox.Size = UDim2.new(1, -20, 0, 50)
+playerListBox.Position = UDim2.new(0, 10, 0, 230)
+playerListBox.CanvasSize = UDim2.new(0, 0, 5, 0)
+playerListBox.Parent = frame
+
+-- Fungsi Minimize UI
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     if minimized then
-        frame.Size = UDim2.new(0, 300, 0, 250)  -- Kembali ke ukuran asli
+        frame.Size = UDim2.new(0, 300, 0, 250)
         minimizeButton.Text = "−"
     else
-        frame.Size = UDim2.new(0, 300, 0, 30)  -- Minimize ukuran frame
+        frame.Size = UDim2.new(0, 300, 0, 30)
         minimizeButton.Text = "+"
     end
     minimized = not minimized
 end)
 
--- Fungsi untuk Menyalin Job ID ke Clipboard
+-- Fungsi Copy Job ID ke Clipboard
 copyJobButton.MouseButton1Click:Connect(function()
-    setclipboard(jobId)  -- Hanya bekerja di executor yang mendukung
-    print("Job ID telah disalin:", jobId)
+    if setclipboard then
+        setclipboard(jobId)
+        print("Job ID disalin:", jobId)
+    else
+        print("Executor tidak mendukung setclipboard.")
+    end
 end)
 
--- Fungsi untuk Bergabung ke Server dengan Job ID
+-- Fungsi Join ke Server dengan Job ID
 joinJobButton.MouseButton1Click:Connect(function()
     local jobInput = jobIdTextBox.Text
     if jobInput and jobInput ~= "" then
@@ -47,16 +84,18 @@ joinJobButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Fungsi untuk Scan Daftar Pemain di Server
+-- Fungsi Scan Daftar Pemain di Server
 scanPlayerButton.MouseButton1Click:Connect(function()
-    playerListBox:ClearAllChildren()  -- Bersihkan daftar sebelumnya
+    playerListBox:ClearAllChildren()
     
     for _, p in pairs(Players:GetPlayers()) do
         local playerLabel = Instance.new("TextLabel")
         playerLabel.Text = p.Name
         playerLabel.Size = UDim2.new(1, 0, 0, 20)
+        playerLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        playerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         playerLabel.Parent = playerListBox
     end
     
-    print("Scan selesai, menampilkan daftar pemain.")
+    print("Scan selesai, daftar pemain ditampilkan.")
 end)
