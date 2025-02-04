@@ -1,10 +1,6 @@
-local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
-
-local player = Players.LocalPlayer
-local jobId = game.JobId
-local adminList = {"Admin", "Moderator", "Staff", "Owner"} -- Nama role admin
+local player = game.Players.LocalPlayer
 
 -- UI
 local screenGui = Instance.new("ScreenGui")
@@ -13,8 +9,7 @@ screenGui.Parent = game.CoreGui
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 350, 0, 300)
 frame.Position = UDim2.new(0.5, -175, 0.5, -150)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Warna abu-abu gelap
-frame.BackgroundTransparency = 0.1 -- Lebih transparan agar enak dilihat
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.Active = true
 frame.Draggable = false
 frame.Parent = screenGui
@@ -22,7 +17,7 @@ frame.Parent = screenGui
 -- Header (untuk drag UI)
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 30)
-header.BackgroundColor3 = Color3.fromRGB(0, 122, 255) -- Warna biru untuk header
+header.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
 header.Parent = frame
 
 -- Logo Text Capy Helper
@@ -54,25 +49,23 @@ removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 removeUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 removeUIButton.Parent = header
 
--- Tombol Scan Player
-local scanButton = Instance.new("TextButton")
-scanButton.Text = "Scan Player"
-scanButton.Size = UDim2.new(0, 150, 0, 40)
-scanButton.Position = UDim2.new(0.5, -75, 0, 50)
-scanButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-scanButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-scanButton.Parent = frame
+-- Tombol Hop Server
+local hopServerButton = Instance.new("TextButton")
+hopServerButton.Text = "Hop Server"
+hopServerButton.Size = UDim2.new(0, 150, 0, 40)
+hopServerButton.Position = UDim2.new(0.5, -75, 0, 50)
+hopServerButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+hopServerButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+hopServerButton.Parent = frame
 
--- Label Hasil Scan
-local scanResults = Instance.new("TextLabel")
-scanResults.Text = "Menunggu scan..."
-scanResults.Size = UDim2.new(1, -20, 0, 200)
-scanResults.Position = UDim2.new(0, 10, 0, 100)
-scanResults.TextColor3 = Color3.fromRGB(255, 255, 255)
-scanResults.BackgroundTransparency = 1
-scanResults.TextWrapped = true
-scanResults.TextXAlignment = Enum.TextXAlignment.Left
-scanResults.Parent = frame
+-- Tombol Rejoin Server
+local rejoinButton = Instance.new("TextButton")
+rejoinButton.Text = "Rejoin Server"
+rejoinButton.Size = UDim2.new(0, 150, 0, 40)
+rejoinButton.Position = UDim2.new(0.5, -75, 0, 100)
+rejoinButton.BackgroundColor3 = Color3.fromRGB(0, 200, 200)
+rejoinButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+rejoinButton.Parent = frame
 
 -- Fitur Dragging (Geser UI di HP & PC)
 local dragging = false
@@ -106,47 +99,43 @@ header.InputChanged:Connect(function(input)
     end
 end)
 
--- Fungsi Scan Player
-local function scanPlayers()
-    local resultText = "🔎 **Hasil Scan Player:**\n"
-    local adminDetected = false
+-- Fungsi Hop Server
+hopServerButton.MouseButton1Click:Connect(function()
+    local servers = {}  
+    local req = syn.request({
+        Url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100",
+        Method = "GET"
+    })
 
-    for _, v in pairs(Players:GetPlayers()) do
-        local username = v.Name
-        local displayName = v.DisplayName
-        resultText = resultText .. "- " .. displayName .. " (" .. username .. ")\n"
+    local body = game:GetService("HttpService"):JSONDecode(req.Body)
 
-        -- Cek apakah pemain adalah admin/staff
-        for _, adminRole in pairs(adminList) do
-            if string.find(string.lower(displayName), string.lower(adminRole)) or string.find(string.lower(username), string.lower(adminRole)) then
-                resultText = resultText .. "**⚠ ADMIN DETECTED!**\n"
-                adminDetected = true
+    if body and body.data then
+        for _, server in pairs(body.data) do
+            if server.id ~= game.JobId then
+                table.insert(servers, server.id)
             end
         end
     end
 
-    scanResults.Text = resultText
-
-    -- Jika ada admin, langsung keluar server
-    if adminDetected then
-        scanResults.Text = scanResults.Text .. "\n🚨 **Admin terdeteksi! Auto keluar...** 🚨"
-        wait(2)
-        TeleportService:Teleport(game.PlaceId, player)
+    if #servers > 0 then
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], player)
+    else
+        print("Tidak ada server lain yang tersedia.")
     end
-end
+end)
 
--- Fungsi Auto Scan Setiap 10 Detik
-local function autoScan()
-    while wait(10) do
-        scanPlayers()
-    end
-end
+-- Fungsi Rejoin Server
+rejoinButton.MouseButton1Click:Connect(function()
+    TeleportService:Teleport(game.PlaceId, player)
+end)
 
--- Jalankan scan otomatis
-spawn(autoScan)
-
--- Event Saat Tombol Scan Ditekan
-scanButton.MouseButton1Click:Connect(scanPlayers)
+-- Fungsi Anti AFK
+local virtualUser = game:GetService("VirtualUser")
+game.Players.LocalPlayer.Idled:Connect(function()
+    virtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    wait(1)
+    virtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
 
 -- Fungsi Minimize UI
 local minimized = false
