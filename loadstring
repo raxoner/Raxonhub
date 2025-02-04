@@ -77,6 +77,17 @@ logoText.Font = Enum.Font.SourceSansBold
 logoText.TextSize = 24
 logoText.Parent = frame
 
+-- Notifikasi Selamat Datang
+local welcomeNotification = Instance.new("TextLabel")
+welcomeNotification.Text = "Selamat datang, " .. player.Name
+welcomeNotification.Size = UDim2.new(1, -20, 0, 30)
+welcomeNotification.Position = UDim2.new(0, 10, 0, 275)
+welcomeNotification.TextColor3 = Color3.fromRGB(255, 255, 255)
+welcomeNotification.BackgroundTransparency = 1
+welcomeNotification.Font = Enum.Font.SourceSans
+welcomeNotification.TextSize = 18
+welcomeNotification.Parent = frame
+
 -- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
@@ -102,13 +113,12 @@ minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
 end)
 
--- Fungsi Hapus UI Selamanya
+-- Tombol untuk Hapus UI Selamanya
 local function removeUI()
     screenGui:Destroy()
     print("UI telah dihapus selamanya.")
 end
 
--- Tombol untuk Hapus UI Selamanya
 removeUIButton.MouseButton1Click:Connect(function()
     removeUI()
 end)
@@ -148,45 +158,50 @@ rejoinButton.MouseButton1Click:Connect(function()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
 end)
 
--- Fitur Drag untuk menggeser UI di HP
-local dragging = false
-local dragStart = Vector2.new()
-local startPos = Vector2.new()
-
--- Menambahkan area yang bisa di-drag (klik untuk memulai drag)
-frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-    end
-end)
-
-frame.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-frame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
--- Fungsi Anti Staff (Deteksi Jika Pemain Adalah Staf)
-local function checkIfStaff()
-    local staffUserIds = {
-        -- Daftar UserID staf, tambahkan User ID pemain yang diketahui staf di sini
-        123456789, 987654321
-    }
-
-    if table.find(staffUserIds, player.UserId) then
-        print("Pemain ini adalah staf! Tidak bisa menggunakan fitur tertentu.")
-        -- Anda bisa menambahkan tindakan lebih lanjut seperti menghentikan akses fitur tertentu
+-- Fitur Anti AFK
+local function preventAFK()
+    while true do
+        game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer("!")
+        wait(30)  -- Kirim pesan setiap 30 detik untuk menjaga agar tidak AFK
     end
 end
 
--- Menjalankan fungsi Anti Staff saat UI diinisialisasi
-checkIfStaff()
+-- Jalankan Anti-AFK
+spawn(preventAFK)
+
+-- Fungsi Auto-Update
+local function checkForUpdates()
+    local latestVersion = "1.0.0"  -- Ganti dengan versi terbaru dari file script atau server
+    local currentVersion = "0.9.0"  -- Versi saat ini
+
+    if latestVersion > currentVersion then
+        print("Ada pembaruan baru! Mengunduh update...")
+        -- Menambahkan fitur untuk mendownload dan memperbarui script
+        -- Bisa menggunakan HTTPRequest untuk mengunduh file baru
+    end
+end
+
+-- Jalankan pengecekan pembaruan saat script berjalan
+spawn(checkForUpdates)
+
+-- Pengaturan Tema: Pilihan Tema Gelap atau Terang
+local isDarkMode = true  -- Ganti dengan pilihan dari pengguna
+
+local function setTheme()
+    if isDarkMode then
+        frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  -- Gelap
+        copyJobButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        joinJobButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        hopServerButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        rejoinButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    else
+        frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Terang
+        copyJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+        joinJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+        hopServerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+        rejoinButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+    end
+end
+
+-- Jalankan pengaturan tema saat script dimulai
+setTheme()
