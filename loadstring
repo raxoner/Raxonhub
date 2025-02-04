@@ -50,15 +50,27 @@ playerListBox.Position = UDim2.new(0, 10, 0, 230)
 playerListBox.CanvasSize = UDim2.new(0, 0, 5, 0)
 playerListBox.Parent = frame
 
--- Fungsi Minimize UI
+-- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     if minimized then
+        -- Restore frame size dan tampilkan kembali semua elemen
         frame.Size = UDim2.new(0, 300, 0, 250)
         minimizeButton.Text = "−"
+        copyJobButton.Visible = true
+        joinJobButton.Visible = true
+        jobIdTextBox.Visible = true
+        scanPlayerButton.Visible = true
+        playerListBox.Visible = true
     else
+        -- Minimize frame dan sembunyikan semua elemen
         frame.Size = UDim2.new(0, 300, 0, 30)
         minimizeButton.Text = "+"
+        copyJobButton.Visible = false
+        joinJobButton.Visible = false
+        jobIdTextBox.Visible = false
+        scanPlayerButton.Visible = false
+        playerListBox.Visible = false
     end
     minimized = not minimized
 end)
@@ -98,4 +110,30 @@ scanPlayerButton.MouseButton1Click:Connect(function()
     end
     
     print("Scan selesai, daftar pemain ditampilkan.")
+end)
+
+-- Fitur Drag untuk menggeser UI
+local dragging = false
+local dragStart = Vector2.new()
+local startPos = Vector2.new()
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
 end)
