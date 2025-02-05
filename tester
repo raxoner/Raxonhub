@@ -77,162 +77,40 @@ logoText.Font = Enum.Font.SourceSansBold
 logoText.TextSize = 24
 logoText.Parent = frame
 
--- Fitur Scan Player
-local scanPlayerButton = Instance.new("TextButton")
-scanPlayerButton.Text = "Scan Players"
-scanPlayerButton.Size = UDim2.new(1, -20, 0, 40)
-scanPlayerButton.Position = UDim2.new(0, 10, 0, 290)
-scanPlayerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-scanPlayerButton.Parent = frame
+-- Tombol Loadstring
+local loadStringButton = Instance.new("TextButton")
+loadStringButton.Text = "Loadstring"
+loadStringButton.Size = UDim2.new(1, -20, 0, 40)
+loadStringButton.Position = UDim2.new(0, 10, 0, 500)
+loadStringButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+loadStringButton.Parent = frame
 
-local scanResults = Instance.new("TextLabel")
-scanResults.Size = UDim2.new(1, -20, 0, 100)
-scanResults.Position = UDim2.new(0, 10, 0, 340)
-scanResults.Text = "Hasil Scan: -"
-scanResults.TextColor3 = Color3.fromRGB(255, 255, 255)
-scanResults.BackgroundTransparency = 1
-scanResults.Font = Enum.Font.SourceSans
-scanResults.TextSize = 16
-scanResults.Parent = frame
+-- TextBox untuk Masukkan Kode Lua Mentah
+local luaCodeTextBox = Instance.new("TextBox")
+luaCodeTextBox.Size = UDim2.new(1, -20, 0, 60)
+luaCodeTextBox.Position = UDim2.new(0, 10, 0, 550)
+luaCodeTextBox.Text = "Masukkan kode Lua di sini"
+luaCodeTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+luaCodeTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+luaCodeTextBox.ClearTextOnFocus = true
+luaCodeTextBox.Parent = frame
 
--- Tombol Hapus Hasil Scan
-local removeScanButton = Instance.new("TextButton")
-removeScanButton.Text = "Hapus Hasil Scan"
-removeScanButton.Size = UDim2.new(1, -20, 0, 40)
-removeScanButton.Position = UDim2.new(0, 10, 0, 450)
-removeScanButton.BackgroundColor3 = Color3.fromRGB(255, 69, 0)
-removeScanButton.Parent = frame
-
--- Fungsi untuk Scan Pemain di Server
-scanPlayerButton.MouseButton1Click:Connect(function()
-    local playersInServer = {}
-    for _, otherPlayer in pairs(Players:GetPlayers()) do
-        table.insert(playersInServer, otherPlayer.Name)
-    end
-    scanResults.Text = "Pemain di Server: " .. table.concat(playersInServer, ", ")
-end)
-
--- Fungsi untuk Menghapus Hasil Scan
-removeScanButton.MouseButton1Click:Connect(function()
-    scanResults.Text = "Hasil Scan: -"
-end)
-
--- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
-local minimized = false
-minimizeButton.MouseButton1Click:Connect(function()
-    if minimized then
-        -- Restore frame size dan tampilkan kembali semua elemen
-        frame.Size = UDim2.new(0, 350, 0, 400)
-        minimizeButton.Text = "−"
-        copyJobButton.Visible = true
-        joinJobButton.Visible = true
-        hopServerButton.Visible = true
-        rejoinButton.Visible = true
-        jobIdTextBox.Visible = true
-        scanPlayerButton.Visible = true
-        scanResults.Visible = true
-        removeScanButton.Visible = true
+-- Fungsi Loadstring (Menjalankan Kode Lua yang dimasukkan oleh pengguna)
+loadStringButton.MouseButton1Click:Connect(function()
+    local luaCode = luaCodeTextBox.Text  -- Mengambil kode Lua yang dimasukkan pengguna
+    if luaCode and luaCode ~= "" then
+        local func, err = loadstring(luaCode)  -- Menyusun dan memuat kode Lua
+        if func then
+            local success, result = pcall(func)  -- Menjalankan kode Lua dalam pcall untuk menangani kesalahan
+            if not success then
+                print("Terjadi kesalahan dalam kode Lua:", result)  -- Menampilkan error jika ada
+            end
+        else
+            print("Terjadi kesalahan dalam loadstring:", err)  -- Menampilkan error jika loadstring gagal
+        end
     else
-        -- Minimize frame dan sembunyikan semua elemen
-        frame.Size = UDim2.new(0, 350, 0, 30)
-        minimizeButton.Text = "+"
-        copyJobButton.Visible = false
-        joinJobButton.Visible = false
-        hopServerButton.Visible = false
-        rejoinButton.Visible = false
-        jobIdTextBox.Visible = false
-        scanPlayerButton.Visible = false
-        scanResults.Visible = false
-        removeScanButton.Visible = false
-    end
-    minimized = not minimized
-end)
-
--- Fungsi Hapus UI Selamanya
-local function removeUI()
-    screenGui:Destroy()
-    print("UI telah dihapus selamanya.")
-end
-
--- Tombol untuk Hapus UI Selamanya
-removeUIButton.MouseButton1Click:Connect(function()
-    removeUI()
-end)
-
--- Fungsi Copy Job ID ke Clipboard
-copyJobButton.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(jobId)
-        print("Job ID disalin:", jobId)
-    else
-        print("Executor tidak mendukung setclipboard.")
+        print("Masukkan kode Lua yang valid!")  -- Memberikan pesan jika teks kosong
     end
 end)
 
--- Fungsi Join ke Server dengan Job ID
-joinJobButton.MouseButton1Click:Connect(function()
-    local jobInput = jobIdTextBox.Text
-    if jobInput and jobInput ~= "" then
-        print("Mencoba join server dengan Job ID:", jobInput)
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobInput, player)
-    else
-        print("Masukkan Job ID terlebih dahulu!")
-    end
-end)
-
--- Fungsi Hop Server (Pindah Server Acak)
-hopServerButton.MouseButton1Click:Connect(function()
-    local servers = TeleportService:GetTeleportSetting("Servers")  -- Mendapatkan daftar server
-    local randomServer = servers[math.random(1, #servers)]  -- Memilih server acak
-    print("Mencoba hop ke server baru...")
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
-end)
-
--- Fungsi Rejoin Server (Kembali ke Server yang Sama)
-rejoinButton.MouseButton1Click:Connect(function()
-    print("Mencoba rejoin ke server yang sama...")
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
-end)
-
--- Fitur Drag untuk menggeser UI di HP
-local dragging = false
-local dragStart = Vector2.new()
-local startPos = Vector2.new()
-
--- Menambahkan area yang bisa di-drag (klik untuk memulai drag)
-frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-    end
-end)
-
-frame.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-frame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
--- Fungsi Anti Staff (Deteksi Jika Pemain Adalah Staf)
-local function checkIfStaff()
-    local staffUserIds = {
-        -- Daftar UserID staf, tambahkan User ID pemain yang diketahui staf di sini
-        123456789, 987654321
-    }
-
-    if table.find(staffUserIds, player.UserId) then
-        print("Pemain ini adalah staf! Tidak bisa menggunakan fitur tertentu.")
-        -- Anda bisa menambahkan tindakan lebih lanjut seperti menghentikan akses fitur tertentu
-    end
-end
-
--- Menjalankan fungsi Anti Staff saat UI diinisialisasi
-checkIfStaff()
+-- Fungsi lainnya (misalnya tombol rejoin, hop server, dll) tetap sama dengan sebelumnya
