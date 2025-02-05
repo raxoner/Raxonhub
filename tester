@@ -4,14 +4,14 @@ local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
 
--- Membuat UI jika belum ada
+-- Membuat UI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 400)  -- Menambahkan sedikit tinggi untuk scan results
-frame.Position = UDim2.new(0.5, -175, 0.5, -175)
-frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
+frame.Size = UDim2.new(0, 350, 0, 550)  -- Perbaikan ukuran agar UI muat
+frame.Position = UDim2.new(0.5, -175, 0.5, -250)
+frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  
 frame.Parent = screenGui
 
 -- Tombol Minimize
@@ -22,11 +22,11 @@ minimizeButton.Position = UDim2.new(1, -35, 0, 5)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 minimizeButton.Parent = frame
 
--- Tombol Hapus UI (X)
+-- Tombol Hapus UI
 local removeUIButton = Instance.new("TextButton")
 removeUIButton.Text = "X"
 removeUIButton.Size = UDim2.new(0, 30, 0, 30)
-removeUIButton.Position = UDim2.new(1, -70, 0, 5)  -- Posisi X sedikit lebih ke kiri dari minimize
+removeUIButton.Position = UDim2.new(1, -70, 0, 5)  
 removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 removeUIButton.Parent = frame
 
@@ -66,51 +66,76 @@ jobIdTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 jobIdTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 jobIdTextBox.Parent = frame
 
--- Logo Text Capy Helper
-local logoText = Instance.new("TextLabel")
-logoText.Text = "Capy Helper"
-logoText.Size = UDim2.new(0, 100, 0, 30)
-logoText.Position = UDim2.new(0, 10, 0, 5)
-logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
-logoText.BackgroundTransparency = 1
-logoText.Font = Enum.Font.SourceSansBold
-logoText.TextSize = 24
-logoText.Parent = frame
+-- Scan Players
+local scanPlayerButton = Instance.new("TextButton")
+scanPlayerButton.Text = "Scan Players"
+scanPlayerButton.Size = UDim2.new(1, -20, 0, 40)
+scanPlayerButton.Position = UDim2.new(0, 10, 0, 280)
+scanPlayerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+scanPlayerButton.Parent = frame
+
+local scanResults = Instance.new("TextLabel")
+scanResults.Size = UDim2.new(1, -20, 0, 100)
+scanResults.Position = UDim2.new(0, 10, 0, 330)
+scanResults.Text = "Hasil Scan: -"
+scanResults.TextColor3 = Color3.fromRGB(255, 255, 255)
+scanResults.BackgroundTransparency = 1
+scanResults.Parent = frame
+
+-- Tombol Hapus Hasil Scan (Sudah dipindahkan)
+local removeScanButton = Instance.new("TextButton")
+removeScanButton.Text = "Hapus Hasil Scan"
+removeScanButton.Size = UDim2.new(1, -20, 0, 40)
+removeScanButton.Position = UDim2.new(0, 10, 0, 440)  -- Dipindahkan ke bawah hasil scan
+removeScanButton.BackgroundColor3 = Color3.fromRGB(255, 69, 0)
+removeScanButton.Parent = frame
 
 -- Tombol Loadstring
 local loadStringButton = Instance.new("TextButton")
 loadStringButton.Text = "Loadstring"
 loadStringButton.Size = UDim2.new(1, -20, 0, 40)
-loadStringButton.Position = UDim2.new(0, 10, 0, 500)
+loadStringButton.Position = UDim2.new(0, 10, 0, 490)
 loadStringButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
 loadStringButton.Parent = frame
 
--- TextBox untuk Masukkan Kode Lua Mentah
+-- TextBox untuk Loadstring
 local luaCodeTextBox = Instance.new("TextBox")
 luaCodeTextBox.Size = UDim2.new(1, -20, 0, 60)
-luaCodeTextBox.Position = UDim2.new(0, 10, 0, 550)
+luaCodeTextBox.Position = UDim2.new(0, 10, 0, 540)
 luaCodeTextBox.Text = "Masukkan kode Lua di sini"
 luaCodeTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 luaCodeTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 luaCodeTextBox.ClearTextOnFocus = true
 luaCodeTextBox.Parent = frame
 
--- Fungsi Loadstring (Menjalankan Kode Lua yang dimasukkan oleh pengguna)
+-- Fungsi Loadstring
 loadStringButton.MouseButton1Click:Connect(function()
-    local luaCode = luaCodeTextBox.Text  -- Mengambil kode Lua yang dimasukkan pengguna
+    local luaCode = luaCodeTextBox.Text
     if luaCode and luaCode ~= "" then
-        local func, err = loadstring(luaCode)  -- Menyusun dan memuat kode Lua
+        local func, err = loadstring(luaCode)
         if func then
-            local success, result = pcall(func)  -- Menjalankan kode Lua dalam pcall untuk menangani kesalahan
+            local success, result = pcall(func)
             if not success then
-                print("Terjadi kesalahan dalam kode Lua:", result)  -- Menampilkan error jika ada
+                print("Error dalam kode Lua:", result)
             end
         else
-            print("Terjadi kesalahan dalam loadstring:", err)  -- Menampilkan error jika loadstring gagal
+            print("Error dalam loadstring:", err)
         end
     else
-        print("Masukkan kode Lua yang valid!")  -- Memberikan pesan jika teks kosong
+        print("Masukkan kode Lua yang valid!")
     end
 end)
 
--- Fungsi lainnya (misalnya tombol rejoin, hop server, dll) tetap sama dengan sebelumnya
+-- Fungsi Scan Players
+scanPlayerButton.MouseButton1Click:Connect(function()
+    local playersInServer = {}
+    for _, otherPlayer in pairs(Players:GetPlayers()) do
+        table.insert(playersInServer, otherPlayer.Name)
+    end
+    scanResults.Text = "Pemain di Server: " .. table.concat(playersInServer, ", ")
+end)
+
+-- Fungsi Hapus Hasil Scan
+removeScanButton.MouseButton1Click:Connect(function()
+    scanResults.Text = "Hasil Scan: -"
+end)
