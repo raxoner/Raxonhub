@@ -8,7 +8,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 600, 0, 400)  -- Menyesuaikan ukuran UI menjadi lebih persegi panjang
+frame.Size = UDim2.new(0, 600, 0, 400)  -- UI menjadi persegi panjang
 frame.Position = UDim2.new(0.5, -300, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
 frame.Parent = screenGui
@@ -117,7 +117,7 @@ local function updateTimeZones()
     end
 end
 
--- Tombol untuk update waktu
+-- Update waktu saat tombol ditekan
 local updateTimeButton = Instance.new("TextButton")
 updateTimeButton.Text = "Update Waktu"
 updateTimeButton.Size = UDim2.new(1, -20, 0, 40)
@@ -125,7 +125,7 @@ updateTimeButton.Position = UDim2.new(0, 10, 0, 370)
 updateTimeButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 updateTimeButton.Parent = frame
 
--- Update waktu saat tombol ditekan
+-- Update waktu ketika tombol ditekan
 updateTimeButton.MouseButton1Click:Connect(function()
     updateTimeZones()
 end)
@@ -200,4 +200,11 @@ hopServerButton.MouseButton1Click:Connect(function()
     local servers = TeleportService:GetTeleportSetting("Servers")  -- Mendapatkan daftar server
     local randomServer = servers[math.random(1, #servers)]  -- Memilih server acak
     print("Mencoba hop ke server baru...")
-    TeleportService:TeleportToPlaceInstance
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
+end)
+
+-- Fungsi Rejoin Server (Kembali ke Server yang Sama)
+rejoinButton.MouseButton1Click:Connect(function()
+    print("Mencoba rejoin ke server yang sama...")
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
+end)
