@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
-
 local player = Players.LocalPlayer
 local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
 
@@ -9,8 +8,8 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 400)  -- Menambahkan sedikit tinggi untuk scan results
-frame.Position = UDim2.new(0.5, -175, 0.5, -175)
+frame.Size = UDim2.new(0, 600, 0, 400)  -- Menyesuaikan ukuran UI menjadi lebih persegi panjang
+frame.Position = UDim2.new(0.5, -300, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
 frame.Parent = screenGui
 
@@ -30,6 +29,7 @@ removeUIButton.Position = UDim2.new(1, -70, 0, 5)  -- Posisi X sedikit lebih ke 
 removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 removeUIButton.Parent = frame
 
+-- Tombol Copy Job ID
 local copyJobButton = Instance.new("TextButton")
 copyJobButton.Text = "Copy Job ID"
 copyJobButton.Size = UDim2.new(1, -20, 0, 40)
@@ -37,6 +37,7 @@ copyJobButton.Position = UDim2.new(0, 10, 0, 40)
 copyJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 copyJobButton.Parent = frame
 
+-- Tombol Join Job
 local joinJobButton = Instance.new("TextButton")
 joinJobButton.Text = "Join by Job ID"
 joinJobButton.Size = UDim2.new(1, -20, 0, 40)
@@ -44,6 +45,7 @@ joinJobButton.Position = UDim2.new(0, 10, 0, 90)
 joinJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 joinJobButton.Parent = frame
 
+-- Tombol Hop Server
 local hopServerButton = Instance.new("TextButton")
 hopServerButton.Text = "Hop Server"
 hopServerButton.Size = UDim2.new(1, -20, 0, 40)
@@ -51,6 +53,7 @@ hopServerButton.Position = UDim2.new(0, 10, 0, 140)
 hopServerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 hopServerButton.Parent = frame
 
+-- Tombol Rejoin Server
 local rejoinButton = Instance.new("TextButton")
 rejoinButton.Text = "Rejoin Server"
 rejoinButton.Size = UDim2.new(1, -20, 0, 40)
@@ -58,6 +61,7 @@ rejoinButton.Position = UDim2.new(0, 10, 0, 190)
 rejoinButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 rejoinButton.Parent = frame
 
+-- Job ID Textbox
 local jobIdTextBox = Instance.new("TextBox")
 jobIdTextBox.Size = UDim2.new(1, -20, 0, 30)
 jobIdTextBox.Position = UDim2.new(0, 10, 0, 240)
@@ -77,44 +81,53 @@ logoText.Font = Enum.Font.SourceSansBold
 logoText.TextSize = 24
 logoText.Parent = frame
 
--- Fitur Scan Player
-local scanPlayerButton = Instance.new("TextButton")
-scanPlayerButton.Text = "Scan Players"
-scanPlayerButton.Size = UDim2.new(1, -20, 0, 40)
-scanPlayerButton.Position = UDim2.new(0, 10, 0, 290)
-scanPlayerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-scanPlayerButton.Parent = frame
+-- Menambahkan jam dari beberapa negara
+local timeZoneLabels = {}
 
-local scanResults = Instance.new("TextLabel")
-scanResults.Size = UDim2.new(1, -20, 0, 100)
-scanResults.Position = UDim2.new(0, 10, 0, 340)
-scanResults.Text = "Hasil Scan: -"
-scanResults.TextColor3 = Color3.fromRGB(255, 255, 255)
-scanResults.BackgroundTransparency = 1
-scanResults.Font = Enum.Font.SourceSans
-scanResults.TextSize = 16
-scanResults.Parent = frame
-
--- Tombol Hapus Hasil Scan
-local removeScanButton = Instance.new("TextButton")
-removeScanButton.Text = "Hapus Hasil Scan"
-removeScanButton.Size = UDim2.new(1, -20, 0, 40)
-removeScanButton.Position = UDim2.new(0, 10, 0, 450)
-removeScanButton.BackgroundColor3 = Color3.fromRGB(255, 69, 0)
-removeScanButton.Parent = frame
-
--- Fungsi untuk Scan Pemain di Server
-scanPlayerButton.MouseButton1Click:Connect(function()
-    local playersInServer = {}
-    for _, otherPlayer in pairs(Players:GetPlayers()) do
-        table.insert(playersInServer, otherPlayer.Name)
+local function updateTimeZones()
+    -- Mendapatkan waktu lokal dan menyesuaikan untuk zona waktu
+    local function getTimeInZone(offset)
+        local currentTime = os.time()
+        local targetTime = currentTime + (offset * 3600)  -- Menghitung offset waktu dalam detik
+        return os.date("%H:%M:%S", targetTime)
     end
-    scanResults.Text = "Pemain di Server: " .. table.concat(playersInServer, ", ")
-end)
 
--- Fungsi untuk Menghapus Hasil Scan
-removeScanButton.MouseButton1Click:Connect(function()
-    scanResults.Text = "Hasil Scan: -"
+    -- Daftar negara dan offset waktu (dalam jam)
+    local timeZones = {
+        {name = "Amerika (GMT-5)", offset = -5},
+        {name = "Inggris (GMT)", offset = 0},
+        {name = "Indonesia (GMT+7)", offset = 7},
+    }
+
+    -- Menampilkan waktu untuk setiap negara
+    for i, zone in ipairs(timeZones) do
+        local label = timeZoneLabels[i]
+        if not label then
+            label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1, -20, 0, 30)
+            label.Position = UDim2.new(0, 10, 0, 290 + (i - 1) * 35)
+            label.TextColor3 = Color3.fromRGB(255, 255, 255)
+            label.BackgroundTransparency = 1
+            label.Font = Enum.Font.SourceSans
+            label.TextSize = 16
+            label.Parent = frame
+            timeZoneLabels[i] = label
+        end
+        label.Text = zone.name .. ": " .. getTimeInZone(zone.offset)
+    end
+end
+
+-- Tombol untuk update waktu
+local updateTimeButton = Instance.new("TextButton")
+updateTimeButton.Text = "Update Waktu"
+updateTimeButton.Size = UDim2.new(1, -20, 0, 40)
+updateTimeButton.Position = UDim2.new(0, 10, 0, 370)
+updateTimeButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+updateTimeButton.Parent = frame
+
+-- Update waktu saat tombol ditekan
+updateTimeButton.MouseButton1Click:Connect(function()
+    updateTimeZones()
 end)
 
 -- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
@@ -122,28 +135,30 @@ local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     if minimized then
         -- Restore frame size dan tampilkan kembali semua elemen
-        frame.Size = UDim2.new(0, 350, 0, 400)
+        frame.Size = UDim2.new(0, 600, 0, 400)
         minimizeButton.Text = "−"
         copyJobButton.Visible = true
         joinJobButton.Visible = true
         hopServerButton.Visible = true
         rejoinButton.Visible = true
         jobIdTextBox.Visible = true
-        scanPlayerButton.Visible = true
-        scanResults.Visible = true
-        removeScanButton.Visible = true
+        updateTimeButton.Visible = true
+        for _, label in ipairs(timeZoneLabels) do
+            label.Visible = true
+        end
     else
         -- Minimize frame dan sembunyikan semua elemen
-        frame.Size = UDim2.new(0, 350, 0, 30)
+        frame.Size = UDim2.new(0, 600, 0, 30)
         minimizeButton.Text = "+"
         copyJobButton.Visible = false
         joinJobButton.Visible = false
         hopServerButton.Visible = false
         rejoinButton.Visible = false
         jobIdTextBox.Visible = false
-        scanPlayerButton.Visible = false
-        scanResults.Visible = false
-        removeScanButton.Visible = false
+        updateTimeButton.Visible = false
+        for _, label in ipairs(timeZoneLabels) do
+            label.Visible = false
+        end
     end
     minimized = not minimized
 end)
@@ -185,54 +200,4 @@ hopServerButton.MouseButton1Click:Connect(function()
     local servers = TeleportService:GetTeleportSetting("Servers")  -- Mendapatkan daftar server
     local randomServer = servers[math.random(1, #servers)]  -- Memilih server acak
     print("Mencoba hop ke server baru...")
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
-end)
-
--- Fungsi Rejoin Server (Kembali ke Server yang Sama)
-rejoinButton.MouseButton1Click:Connect(function()
-    print("Mencoba rejoin ke server yang sama...")
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
-end)
-
--- Fitur Drag untuk menggeser UI di HP
-local dragging = false
-local dragStart = Vector2.new()
-local startPos = Vector2.new()
-
--- Menambahkan area yang bisa di-drag (klik untuk memulai drag)
-frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-    end
-end)
-
-frame.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-frame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
--- Fungsi Anti Staff (Deteksi Jika Pemain Adalah Staf)
-local function checkIfStaff()
-    local staffUserIds = {
-        -- Daftar UserID staf, tambahkan User ID pemain yang diketahui staf di sini
-        123456789, 987654321
-    }
-
-    if table.find(staffUserIds, player.UserId) then
-        print("Pemain ini adalah staf! Tidak bisa menggunakan fitur tertentu.")
-        -- Anda bisa menambahkan tindakan lebih lanjut seperti menghentikan akses fitur tertentu
-    end
-end
-
--- Menjalankan fungsi Anti Staff saat UI diinisialisasi
-checkIfStaff()
+    TeleportService:TeleportToPlaceInstance
