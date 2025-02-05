@@ -32,8 +32,9 @@ end)
 
 UserInputService.InputChanged:Connect(function(input)
     if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position
-        frame.Size = UDim2.new(0, delta.X - frame.Position.X.Offset, 0, delta.Y - frame.Position.Y.Offset)
+        local newWidth = math.max(300, input.Position.X - frame.AbsolutePosition.X)
+        local newHeight = math.max(300, input.Position.Y - frame.AbsolutePosition.Y)
+        frame.Size = UDim2.new(0, newWidth, 0, newHeight)
     end
 end)
 
@@ -73,16 +74,25 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- **Judul UI**
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Text = "Capy Helper"
-titleLabel.Size = UDim2.new(1, 0, 0, 40)
-titleLabel.Position = UDim2.new(0, 0, 0, 5)
-titleLabel.BackgroundTransparency = 1
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 28
-titleLabel.Parent = frame
+-- **Tombol Minimize**
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Text = "−"
+minimizeButton.Size = UDim2.new(0, 40, 0, 40)
+minimizeButton.Position = UDim2.new(1, -90, 0, 5)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+minimizeButton.Parent = frame
+
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    if minimized then
+        frame.Size = UDim2.new(0, 400, 0, 450)
+        minimizeButton.Text = "−"
+    else
+        frame.Size = UDim2.new(0, 400, 0, 40)
+        minimizeButton.Text = "+"
+    end
+    minimized = not minimized
+end)
 
 -- **Tombol Hapus UI**
 local removeUIButton = Instance.new("TextButton")
@@ -97,6 +107,16 @@ removeUIButton.MouseButton1Click:Connect(function()
     print("UI telah dihapus.")
 end)
 
+-- **Judul UI**
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Text = "Capy Helper"
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 28
+titleLabel.Parent = frame
+
 -- **Input Job ID**
 local jobIdTextBox = Instance.new("TextBox")
 jobIdTextBox.Size = UDim2.new(0.8, 0, 0, 40)
@@ -104,7 +124,7 @@ jobIdTextBox.Position = UDim2.new(0.1, 0, 0, 60)
 jobIdTextBox.Text = "Masukkan Job ID"
 jobIdTextBox.Parent = frame
 
--- **Fungsi Membuat Tombol**
+-- **Membuat Tombol**
 local function createButton(text, posY)
     local button = Instance.new("TextButton")
     button.Text = text
@@ -126,8 +146,6 @@ copyJobButton.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(jobId)
         print("Job ID disalin:", jobId)
-    else
-        print("Executor tidak mendukung setclipboard.")
     end
 end)
 
@@ -153,26 +171,3 @@ scanButton.MouseButton1Click:Connect(function()
     end
     print("Pemain dalam server: " .. table.concat(playersList, ", "))
 end)
-
--- **Menampilkan Jam Dunia**
-local timeLabel = Instance.new("TextLabel")
-timeLabel.Size = UDim2.new(1, 0, 0, 60)
-timeLabel.Position = UDim2.new(0, 0, 0, 360)
-timeLabel.BackgroundTransparency = 1
-timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-timeLabel.Parent = frame
-
-local function updateTime()
-    local timeNow = os.time()
-    local est = os.date("!%H:%M:%S", timeNow - 5 * 3600)
-    local gmt = os.date("!%H:%M:%S", timeNow)
-    local wib = os.date("!%H:%M:%S", timeNow + 7 * 3600)
-    
-    timeLabel.Text = "🕒 Waktu Dunia\nEST: " .. est .. " | GMT: " .. gmt .. " | WIB: " .. wib
-end
-
-updateTime()
-while true do
-    updateTime()
-    wait(1)
-end
