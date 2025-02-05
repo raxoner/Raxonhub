@@ -1,203 +1,192 @@
--- Layanan yang dibutuhkan
+local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
-local UserInputService = game:GetService("UserInputService")
-local player = game.Players.LocalPlayer
-local clipboard = game:GetService("Clipboard")
 
--- UI Setup
+local player = Players.LocalPlayer
+local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
+
+-- Membuat UI jika belum ada
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 300)
-frame.Position = UDim2.new(0.5, -175, 0.5, -150)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-frame.Active = true
-frame.Draggable = false
+frame.Size = UDim2.new(0, 350, 0, 350)
+frame.Position = UDim2.new(0.5, -175, 0.5, -175)
+frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
 frame.Parent = screenGui
 
--- Header for drag UI
-local header = Instance.new("Frame")
-header.Size = UDim2.new(1, 0, 0, 30)
-header.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
-header.Parent = frame
-
--- Logo Text
-local logoText = Instance.new("TextLabel")
-logoText.Text = "Capy Helper"
-logoText.Size = UDim2.new(0, 150, 0, 30)
-logoText.Position = UDim2.new(0, 10, 0, 0)
-logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
-logoText.BackgroundTransparency = 1
-logoText.Font = Enum.Font.SourceSansBold
-logoText.TextSize = 22
-logoText.Parent = header
-
--- Minimize Button
+-- Tombol Minimize
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Text = "−"
 minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-minimizeButton.Position = UDim2.new(1, -35, 0, 0)
+minimizeButton.Position = UDim2.new(1, -35, 0, 5)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeButton.Parent = header
+minimizeButton.Parent = frame
 
--- Close Button (X)
+-- Tombol Hapus UI (X)
 local removeUIButton = Instance.new("TextButton")
 removeUIButton.Text = "X"
 removeUIButton.Size = UDim2.new(0, 30, 0, 30)
-removeUIButton.Position = UDim2.new(1, -70, 0, 0)
+removeUIButton.Position = UDim2.new(1, -70, 0, 5)  -- Posisi X sedikit lebih ke kiri dari minimize
 removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-removeUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-removeUIButton.Parent = header
+removeUIButton.Parent = frame
 
--- Hop Server Button
+local copyJobButton = Instance.new("TextButton")
+copyJobButton.Text = "Copy Job ID"
+copyJobButton.Size = UDim2.new(1, -20, 0, 40)
+copyJobButton.Position = UDim2.new(0, 10, 0, 40)
+copyJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+copyJobButton.Parent = frame
+
+local joinJobButton = Instance.new("TextButton")
+joinJobButton.Text = "Join by Job ID"
+joinJobButton.Size = UDim2.new(1, -20, 0, 40)
+joinJobButton.Position = UDim2.new(0, 10, 0, 90)
+joinJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+joinJobButton.Parent = frame
+
 local hopServerButton = Instance.new("TextButton")
 hopServerButton.Text = "Hop Server"
-hopServerButton.Size = UDim2.new(0, 150, 0, 40)
-hopServerButton.Position = UDim2.new(0.5, -75, 0, 50)
-hopServerButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-hopServerButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+hopServerButton.Size = UDim2.new(1, -20, 0, 40)
+hopServerButton.Position = UDim2.new(0, 10, 0, 140)
+hopServerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 hopServerButton.Parent = frame
 
--- Rejoin Server Button
 local rejoinButton = Instance.new("TextButton")
 rejoinButton.Text = "Rejoin Server"
-rejoinButton.Size = UDim2.new(0, 150, 0, 40)
-rejoinButton.Position = UDim2.new(0.5, -75, 0, 100)
-rejoinButton.BackgroundColor3 = Color3.fromRGB(0, 200, 200)
-rejoinButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+rejoinButton.Size = UDim2.new(1, -20, 0, 40)
+rejoinButton.Position = UDim2.new(0, 10, 0, 190)
+rejoinButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 rejoinButton.Parent = frame
 
--- Input for Job ID to join a server
-local jobIDTextBox = Instance.new("TextBox")
-jobIDTextBox.Size = UDim2.new(0, 200, 0, 40)
-jobIDTextBox.Position = UDim2.new(0.5, -100, 0, 150)
-jobIDTextBox.PlaceholderText = "Enter Job ID"
-jobIDTextBox.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-jobIDTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-jobIDTextBox.Parent = frame
+local jobIdTextBox = Instance.new("TextBox")
+jobIdTextBox.Size = UDim2.new(1, -20, 0, 30)
+jobIdTextBox.Position = UDim2.new(0, 10, 0, 240)
+jobIdTextBox.Text = "Masukkan Job ID"
+jobIdTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+jobIdTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+jobIdTextBox.Parent = frame
 
--- Button to Join Server by Job ID
-local joinJobIDButton = Instance.new("TextButton")
-joinJobIDButton.Text = "Join Server by Job ID"
-joinJobIDButton.Size = UDim2.new(0, 200, 0, 40)
-joinJobIDButton.Position = UDim2.new(0.5, -100, 0, 200)
-joinJobIDButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-joinJobIDButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-joinJobIDButton.Parent = frame
+-- Logo Text Capy Helper
+local logoText = Instance.new("TextLabel")
+logoText.Text = "Capy Helper"
+logoText.Size = UDim2.new(0, 100, 0, 30)
+logoText.Position = UDim2.new(0, 10, 0, 5)
+logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+logoText.BackgroundTransparency = 1
+logoText.Font = Enum.Font.SourceSansBold
+logoText.TextSize = 24
+logoText.Parent = frame
 
--- Copy Job ID Button
-local copyJobIDButton = Instance.new("TextButton")
-copyJobIDButton.Text = "Copy Job ID"
-copyJobIDButton.Size = UDim2.new(0, 150, 0, 40)
-copyJobIDButton.Position = UDim2.new(0.5, -75, 0, 250)
-copyJobIDButton.BackgroundColor3 = Color3.fromRGB(255, 150, 0)
-copyJobIDButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-copyJobIDButton.Parent = frame
-
--- Dragging functionality (for both PC and mobile)
-local dragging = false
-local dragInput, mousePos, framePos
-
-local function updatePosition(input)
-    local delta = input.Position - mousePos
-    frame.Position = UDim2.new(
-        framePos.X.Scale, framePos.X.Offset + delta.X,
-        framePos.Y.Scale, framePos.Y.Offset + delta.Y
-    )
-end
-
-header.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        mousePos = input.Position
-        framePos = frame.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-header.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        updatePosition(input)
-    end
-end)
-
--- Hop Server Function
-hopServerButton.MouseButton1Click:Connect(function()
-    local servers = {}
-    local req = syn.request({
-        Url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100",
-        Method = "GET"
-    })
-
-    local body = game:GetService("HttpService"):JSONDecode(req.Body)
-
-    if body and body.data then
-        for _, server in pairs(body.data) do
-            if server.id ~= game.JobId then
-                table.insert(servers, server.id)
-            end
-        end
-    end
-
-    if #servers > 0 then
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], player)
-    else
-        print("Tidak ada server lain yang tersedia.")
-    end
-end)
-
--- Rejoin Server Function
-rejoinButton.MouseButton1Click:Connect(function()
-    TeleportService:Teleport(game.PlaceId, player)
-end)
-
--- Join Server by Job ID Function
-joinJobIDButton.MouseButton1Click:Connect(function()
-    local jobID = jobIDTextBox.Text
-    if jobID ~= "" then
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobID, player)
-    else
-        print("Masukkan Job ID yang valid.")
-    end
-end)
-
--- Copy Job ID to Clipboard
-copyJobIDButton.MouseButton1Click:Connect(function()
-    local jobID = game.JobId
-    clipboard:Set(jobID)
-    print("Job ID telah disalin ke clipboard.")
-end)
-
--- Anti AFK
-local virtualUser = game:GetService("VirtualUser")
-game.Players.LocalPlayer.Idled:Connect(function()
-    virtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-    wait(1)
-    virtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-end)
-
--- Minimize UI Function
+-- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
 local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     if minimized then
-        frame.Size = UDim2.new(0, 350, 0, 300)
+        -- Restore frame size dan tampilkan kembali semua elemen
+        frame.Size = UDim2.new(0, 350, 0, 350)
         minimizeButton.Text = "−"
+        copyJobButton.Visible = true
+        joinJobButton.Visible = true
+        hopServerButton.Visible = true
+        rejoinButton.Visible = true
+        jobIdTextBox.Visible = true
     else
+        -- Minimize frame dan sembunyikan semua elemen
         frame.Size = UDim2.new(0, 350, 0, 30)
         minimizeButton.Text = "+"
+        copyJobButton.Visible = false
+        joinJobButton.Visible = false
+        hopServerButton.Visible = false
+        rejoinButton.Visible = false
+        jobIdTextBox.Visible = false
     end
     minimized = not minimized
 end)
 
--- Remove UI Function (X)
-removeUIButton.MouseButton1Click:Connect(function()
+-- Fungsi Hapus UI Selamanya
+local function removeUI()
     screenGui:Destroy()
     print("UI telah dihapus selamanya.")
+end
+
+-- Tombol untuk Hapus UI Selamanya
+removeUIButton.MouseButton1Click:Connect(function()
+    removeUI()
 end)
+
+-- Fungsi Copy Job ID ke Clipboard
+copyJobButton.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(jobId)
+        print("Job ID disalin:", jobId)
+    else
+        print("Executor tidak mendukung setclipboard.")
+    end
+end)
+
+-- Fungsi Join ke Server dengan Job ID
+joinJobButton.MouseButton1Click:Connect(function()
+    local jobInput = jobIdTextBox.Text
+    if jobInput and jobInput ~= "" then
+        print("Mencoba join server dengan Job ID:", jobInput)
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobInput, player)
+    else
+        print("Masukkan Job ID terlebih dahulu!")
+    end
+end)
+
+-- Fungsi Hop Server (Pindah Server Acak)
+hopServerButton.MouseButton1Click:Connect(function()
+    local servers = TeleportService:GetTeleportSetting("Servers")  -- Mendapatkan daftar server
+    local randomServer = servers[math.random(1, #servers)]  -- Memilih server acak
+    print("Mencoba hop ke server baru...")
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
+end)
+
+-- Fungsi Rejoin Server (Kembali ke Server yang Sama)
+rejoinButton.MouseButton1Click:Connect(function()
+    print("Mencoba rejoin ke server yang sama...")
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
+end)
+
+-- Fitur Drag untuk menggeser UI di HP
+local dragging = false
+local dragStart = Vector2.new()
+local startPos = Vector2.new()
+
+-- Menambahkan area yang bisa di-drag (klik untuk memulai drag)
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+-- Fungsi Anti Staff (Deteksi Jika Pemain Adalah Staf)
+local function checkIfStaff()
+    local staffUserIds = {
+        -- Daftar UserID staf, tambahkan User ID pemain yang diketahui staf di sini
+        123456789, 987654321
+    }
+
+    if table.find(staffUserIds, player.UserId) then
+        print("Pemain ini adalah staf! Tidak bisa menggunakan fitur tertentu.")
+        -- Anda bisa menambahkan tindakan lebih lanjut seperti menghentikan akses fitur tertentu
+    end
+end
+
+-- Menjalankan fungsi Anti Staff saat UI diinisialisasi
+checkIfStaff()
