@@ -1,180 +1,127 @@
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
+local UserInputService = game:GetService("UserInputService")
+
 local player = Players.LocalPlayer
 local jobId = game.JobId  -- Mengambil Job ID Server Saat Ini
 
--- Membuat UI jika belum ada
+-- Membuat UI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 600, 0, 400)  -- UI menjadi persegi panjang
-frame.Position = UDim2.new(0.5, -300, 0.5, -200)
-frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)  -- Warna Biru
+frame.Size = UDim2.new(0, 400, 0, 450) -- Ukuran default
+frame.Position = UDim2.new(0.5, -200, 0.5, -225)
+frame.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
 frame.Parent = screenGui
+frame.Active = true  -- Untuk drag & resize
 
--- Tombol Minimize
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Text = "−"
-minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-minimizeButton.Position = UDim2.new(1, -35, 0, 5)
-minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-minimizeButton.Parent = frame
+-- **Fitur Resize UI**
+local resizeHandle = Instance.new("Frame")
+resizeHandle.Size = UDim2.new(0, 20, 0, 20)
+resizeHandle.Position = UDim2.new(1, -20, 1, -20)
+resizeHandle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+resizeHandle.Parent = frame
 
--- Tombol Hapus UI (X)
+local resizing = false
+resizeHandle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = true
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position
+        frame.Size = UDim2.new(0, delta.X - frame.Position.X.Offset, 0, delta.Y - frame.Position.Y.Offset)
+    end
+end)
+
+resizeHandle.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = false
+    end
+end)
+
+-- **Fitur Geser UI (Drag UI)**
+local dragging = false
+local dragInput, dragStart, startPos
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(0, startPos.X.Offset + delta.X, 0, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- **Judul UI**
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Text = "Capy Helper"
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.Position = UDim2.new(0, 0, 0, 5)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 28
+titleLabel.Parent = frame
+
+-- **Tombol Hapus UI**
 local removeUIButton = Instance.new("TextButton")
 removeUIButton.Text = "X"
-removeUIButton.Size = UDim2.new(0, 30, 0, 30)
-removeUIButton.Position = UDim2.new(1, -70, 0, 5)  -- Posisi X sedikit lebih ke kiri dari minimize
+removeUIButton.Size = UDim2.new(0, 40, 0, 40)
+removeUIButton.Position = UDim2.new(1, -45, 0, 5)
 removeUIButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 removeUIButton.Parent = frame
 
--- Tombol Copy Job ID
-local copyJobButton = Instance.new("TextButton")
-copyJobButton.Text = "Copy Job ID"
-copyJobButton.Size = UDim2.new(1, -20, 0, 40)
-copyJobButton.Position = UDim2.new(0, 10, 0, 40)
-copyJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-copyJobButton.Parent = frame
+removeUIButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+    print("UI telah dihapus.")
+end)
 
--- Tombol Join Job
-local joinJobButton = Instance.new("TextButton")
-joinJobButton.Text = "Join by Job ID"
-joinJobButton.Size = UDim2.new(1, -20, 0, 40)
-joinJobButton.Position = UDim2.new(0, 10, 0, 90)
-joinJobButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-joinJobButton.Parent = frame
-
--- Tombol Hop Server
-local hopServerButton = Instance.new("TextButton")
-hopServerButton.Text = "Hop Server"
-hopServerButton.Size = UDim2.new(1, -20, 0, 40)
-hopServerButton.Position = UDim2.new(0, 10, 0, 140)
-hopServerButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-hopServerButton.Parent = frame
-
--- Tombol Rejoin Server
-local rejoinButton = Instance.new("TextButton")
-rejoinButton.Text = "Rejoin Server"
-rejoinButton.Size = UDim2.new(1, -20, 0, 40)
-rejoinButton.Position = UDim2.new(0, 10, 0, 190)
-rejoinButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-rejoinButton.Parent = frame
-
--- Job ID Textbox
+-- **Input Job ID**
 local jobIdTextBox = Instance.new("TextBox")
-jobIdTextBox.Size = UDim2.new(1, -20, 0, 30)
-jobIdTextBox.Position = UDim2.new(0, 10, 0, 240)
+jobIdTextBox.Size = UDim2.new(0.8, 0, 0, 40)
+jobIdTextBox.Position = UDim2.new(0.1, 0, 0, 60)
 jobIdTextBox.Text = "Masukkan Job ID"
-jobIdTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-jobIdTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 jobIdTextBox.Parent = frame
 
--- Logo Text Capy Helper
-local logoText = Instance.new("TextLabel")
-logoText.Text = "Capy Helper"
-logoText.Size = UDim2.new(0, 100, 0, 30)
-logoText.Position = UDim2.new(0, 10, 0, 5)
-logoText.TextColor3 = Color3.fromRGB(255, 255, 255)
-logoText.BackgroundTransparency = 1
-logoText.Font = Enum.Font.SourceSansBold
-logoText.TextSize = 24
-logoText.Parent = frame
-
--- Menambahkan jam dari beberapa negara
-local timeZoneLabels = {}
-
-local function updateTimeZones()
-    -- Mendapatkan waktu lokal dan menyesuaikan untuk zona waktu
-    local function getTimeInZone(offset)
-        local currentTime = os.time()
-        local targetTime = currentTime + (offset * 3600)  -- Menghitung offset waktu dalam detik
-        return os.date("%H:%M:%S", targetTime)
-    end
-
-    -- Daftar negara dan offset waktu (dalam jam)
-    local timeZones = {
-        {name = "Amerika (GMT-5)", offset = -5},
-        {name = "Inggris (GMT)", offset = 0},
-        {name = "Indonesia (GMT+7)", offset = 7},
-    }
-
-    -- Menampilkan waktu untuk setiap negara
-    for i, zone in ipairs(timeZones) do
-        local label = timeZoneLabels[i]
-        if not label then
-            label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1, -20, 0, 30)
-            label.Position = UDim2.new(0, 10, 0, 290 + (i - 1) * 35)
-            label.TextColor3 = Color3.fromRGB(255, 255, 255)
-            label.BackgroundTransparency = 1
-            label.Font = Enum.Font.SourceSans
-            label.TextSize = 16
-            label.Parent = frame
-            timeZoneLabels[i] = label
-        end
-        label.Text = zone.name .. ": " .. getTimeInZone(zone.offset)
-    end
+-- **Fungsi Membuat Tombol**
+local function createButton(text, posY)
+    local button = Instance.new("TextButton")
+    button.Text = text
+    button.Size = UDim2.new(0.8, 0, 0, 40)
+    button.Position = UDim2.new(0.1, 0, 0, posY)
+    button.Parent = frame
+    return button
 end
 
--- Update waktu saat tombol ditekan
-local updateTimeButton = Instance.new("TextButton")
-updateTimeButton.Text = "Update Waktu"
-updateTimeButton.Size = UDim2.new(1, -20, 0, 40)
-updateTimeButton.Position = UDim2.new(0, 10, 0, 370)
-updateTimeButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-updateTimeButton.Parent = frame
+-- **Tombol-Tombol**
+local copyJobButton = createButton("Copy Job ID", 110)
+local joinJobButton = createButton("Join by Job ID", 160)
+local hopServerButton = createButton("Hop Server", 210)
+local rejoinButton = createButton("Rejoin Server", 260)
+local scanButton = createButton("Scan Player", 310)
 
--- Update waktu ketika tombol ditekan
-updateTimeButton.MouseButton1Click:Connect(function()
-    updateTimeZones()
-end)
-
--- Fungsi Minimize UI (Menyembunyikan Semua Elemen dengan Visible)
-local minimized = false
-minimizeButton.MouseButton1Click:Connect(function()
-    if minimized then
-        -- Restore frame size dan tampilkan kembali semua elemen
-        frame.Size = UDim2.new(0, 600, 0, 400)
-        minimizeButton.Text = "−"
-        copyJobButton.Visible = true
-        joinJobButton.Visible = true
-        hopServerButton.Visible = true
-        rejoinButton.Visible = true
-        jobIdTextBox.Visible = true
-        updateTimeButton.Visible = true
-        for _, label in ipairs(timeZoneLabels) do
-            label.Visible = true
-        end
-    else
-        -- Minimize frame dan sembunyikan semua elemen
-        frame.Size = UDim2.new(0, 600, 0, 30)
-        minimizeButton.Text = "+"
-        copyJobButton.Visible = false
-        joinJobButton.Visible = false
-        hopServerButton.Visible = false
-        rejoinButton.Visible = false
-        jobIdTextBox.Visible = false
-        updateTimeButton.Visible = false
-        for _, label in ipairs(timeZoneLabels) do
-            label.Visible = false
-        end
-    end
-    minimized = not minimized
-end)
-
--- Fungsi Hapus UI Selamanya
-local function removeUI()
-    screenGui:Destroy()
-    print("UI telah dihapus selamanya.")
-end
-
--- Tombol untuk Hapus UI Selamanya
-removeUIButton.MouseButton1Click:Connect(function()
-    removeUI()
-end)
-
--- Fungsi Copy Job ID ke Clipboard
+-- **Fungsi Tombol**
 copyJobButton.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(jobId)
@@ -184,27 +131,48 @@ copyJobButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Fungsi Join ke Server dengan Job ID
 joinJobButton.MouseButton1Click:Connect(function()
     local jobInput = jobIdTextBox.Text
     if jobInput and jobInput ~= "" then
-        print("Mencoba join server dengan Job ID:", jobInput)
         TeleportService:TeleportToPlaceInstance(game.PlaceId, jobInput, player)
-    else
-        print("Masukkan Job ID terlebih dahulu!")
     end
 end)
 
--- Fungsi Hop Server (Pindah Server Acak)
 hopServerButton.MouseButton1Click:Connect(function()
-    local servers = TeleportService:GetTeleportSetting("Servers")  -- Mendapatkan daftar server
-    local randomServer = servers[math.random(1, #servers)]  -- Memilih server acak
-    print("Mencoba hop ke server baru...")
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
+    TeleportService:Teleport(game.PlaceId, player)
 end)
 
--- Fungsi Rejoin Server (Kembali ke Server yang Sama)
 rejoinButton.MouseButton1Click:Connect(function()
-    print("Mencoba rejoin ke server yang sama...")
     TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
 end)
+
+scanButton.MouseButton1Click:Connect(function()
+    local playersList = {}
+    for _, p in pairs(Players:GetPlayers()) do
+        table.insert(playersList, p.Name)
+    end
+    print("Pemain dalam server: " .. table.concat(playersList, ", "))
+end)
+
+-- **Menampilkan Jam Dunia**
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Size = UDim2.new(1, 0, 0, 60)
+timeLabel.Position = UDim2.new(0, 0, 0, 360)
+timeLabel.BackgroundTransparency = 1
+timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+timeLabel.Parent = frame
+
+local function updateTime()
+    local timeNow = os.time()
+    local est = os.date("!%H:%M:%S", timeNow - 5 * 3600)
+    local gmt = os.date("!%H:%M:%S", timeNow)
+    local wib = os.date("!%H:%M:%S", timeNow + 7 * 3600)
+    
+    timeLabel.Text = "🕒 Waktu Dunia\nEST: " .. est .. " | GMT: " .. gmt .. " | WIB: " .. wib
+end
+
+updateTime()
+while true do
+    updateTime()
+    wait(1)
+end
